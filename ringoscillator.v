@@ -1,8 +1,8 @@
 `default_nettype none
 
+// Ring-Oscillator.
 // Lattice ICE40 specific.
 // May also work for ECP5 when `defining SB_LUT4 to LUT4.
-
 module ringoscillator(output wire out);
 
 	wire chain_in, chain_out;
