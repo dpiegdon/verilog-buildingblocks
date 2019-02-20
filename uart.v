@@ -25,7 +25,7 @@
 //
 // ChangeLog
 //	2017-11-22	revisited original upstream: https://opencores.org/project,osdvu
-//  			and adapted it to supply tx_free signal.
+//  	(dpiegdon)	and adapted it to supply tx_free signal.
 //
 //  			halved required clock cycles to support high baudrates
 //  			with low system clock.
@@ -33,6 +33,7 @@
 //  			set baudrate to upper limit of 12M. (limit is FT2232H)
 //
 //	2019-02-20	code- and style-cleanup
+//	(dpiegdon)
 
 `default_nettype none
 
