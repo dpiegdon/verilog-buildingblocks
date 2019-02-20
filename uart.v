@@ -32,40 +32,48 @@
 //
 //  			set baudrate to upper limit of 12M. (limit is FT2232H)
 //
+//	2019-02-20	code- and style-cleanup
+
+`default_nettype none
+
 module uart(
-	input clk, // The master clock for this module
-	input rst, // Synchronous reset.
-	input rx, // Incoming serial line
-	output tx, // Outgoing serial line
-	input transmit, // Signal to transmit
-	output tx_free, // Transmitter is idle
-	input [7:0] tx_byte, // Byte to transmit
-	output received, // Indicated that a byte has been received.
-	output [7:0] rx_byte, // Byte received
-	output is_receiving, // Low when receive line is idle.
-	output is_transmitting, // Low when transmit line is idle.
-	output recv_error // Indicates error in receiving packet.
+	input wire clk,			// The master clock for this module
+	input wire rst,			// Synchronous reset.
+	input wire rx,			// Incoming serial line
+	output wire tx,			// Outgoing serial line
+	input wire transmit,		// Signal to transmit
+	output wire tx_free,		// Transmitter is idle
+	input wire [7:0] tx_byte,	// Byte to transmit
+	output wire received,		// Indicated that a byte has been received.
+	output wire [7:0] rx_byte,	// Byte received
+	output wire is_receiving,	// Low when receive line is idle.
+	output wire is_transmitting,	// Low when transmit line is idle.
+	output wire recv_error		// Indicates error in receiving packet.
 );
 
-parameter CLOCKFRQ=48_000_000; // Frequency of the oscillator
-parameter BAUDRATE=12_000_000; // Baudrate to use
-parameter CLOCK_DIVIDE=(CLOCKFRQ/(BAUDRATE*2)); // clock rate / (baud rate * 2)
+// Frequency of the oscillator
+// (must be multiple of BAUDRATE, see CLOCK_DIVIDE)
+parameter CLOCKFRQ = 48_000_000;
+// Baudrate to use
+parameter BAUDRATE = 12_000_000;
+// Internal clock divider must evaluate to an integer:
+localparam CLOCK_DIVIDE = (CLOCKFRQ/(BAUDRATE*2));
 
 // States for the receiving state machine.
 // These are just constants, not parameters to override.
-parameter RX_IDLE = 0;
-parameter RX_CHECK_START = 1;
-parameter RX_READ_BITS = 2;
-parameter RX_CHECK_STOP = 3;
-parameter RX_DELAY_RESTART = 4;
-parameter RX_ERROR = 5;
-parameter RX_RECEIVED = 6;
+localparam RX_IDLE = 0;
+localparam RX_CHECK_START = 1;
+localparam RX_READ_BITS = 2;
+localparam RX_CHECK_STOP = 3;
+localparam RX_DELAY_RESTART = 4;
+localparam RX_ERROR = 5;
+localparam RX_RECEIVED = 6;
 
 // States for the transmitting state machine.
 // Constants - do not override.
-parameter TX_IDLE = 0;
-parameter TX_SENDING = 1;
-parameter TX_DELAY_RESTART = 2;
+localparam TX_IDLE = 0;
+localparam TX_SENDING = 1;
+localparam TX_DELAY_RESTART = 2;
 
 reg [10:0] rx_clk_divider = CLOCK_DIVIDE;
 reg [10:0] tx_clk_divider = CLOCK_DIVIDE;
@@ -81,17 +89,19 @@ reg [5:0] tx_countdown;
 reg [3:0] tx_bits_remaining;
 reg [7:0] tx_data;
 
-assign tx_free = tx_state == TX_IDLE;
-assign received = recv_state == RX_RECEIVED;
-assign recv_error = recv_state == RX_ERROR;
-assign is_receiving = recv_state != RX_IDLE;
+assign tx_free = (tx_state == TX_IDLE);
+assign received = (recv_state == RX_RECEIVED);
+assign recv_error = (recv_state == RX_ERROR);
+assign is_receiving = (recv_state != RX_IDLE);
 assign rx_byte = rx_data;
 
 assign tx = tx_out;
-assign is_transmitting = tx_state != TX_IDLE;
+assign is_transmitting = (tx_state != TX_IDLE);
 
 always @(posedge clk) begin
 	if (rst) begin
+		rx_clk_divider = CLOCK_DIVIDE;
+		tx_clk_divider = CLOCK_DIVIDE;
 		recv_state = RX_IDLE;
 		tx_state = TX_IDLE;
 	end
@@ -226,3 +236,4 @@ always @(posedge clk) begin
 end
 
 endmodule
+
