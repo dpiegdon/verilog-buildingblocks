@@ -6,7 +6,7 @@
 // May also work for ECP5 when `defining SB_LUT4 to LUT4.
 module randomized_lfsr16(input wire clk, output wire [0:15] out, output wire metastable, input wire rst);
 
-	metastable_oscillator osci(metastable);
+	metastable_oscillator_depth2 osci(metastable);
 	lfsr shiftreg(clk, metastable, out, rst);
 
 endmodule
