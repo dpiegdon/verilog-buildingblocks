@@ -38,13 +38,13 @@
 `default_nettype none
 
 module uart(
-	input wire clk,			// The master clock for this module
-	input wire rst,			// Synchronous reset.
-	input wire rx,			// Incoming serial line
+	input  wire clk,		// The master clock for this module
+	input  wire rst,		// Synchronous reset.
+	input  wire rx,			// Incoming serial line
 	output wire tx,			// Outgoing serial line
-	input wire transmit,		// Signal to transmit
+	input  wire transmit,		// Signal to transmit
 	output wire tx_free,		// Transmitter is idle
-	input wire [7:0] tx_byte,	// Byte to transmit
+	input  wire [7:0] tx_byte,	// Byte to transmit
 	output wire received,		// Indicated that a byte has been received.
 	output wire [7:0] rx_byte,	// Byte received
 	output wire is_receiving,	// Low when receive line is idle.
