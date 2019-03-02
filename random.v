@@ -98,9 +98,9 @@ endmodule
 // May also work for ECP5 when `defining SB_LUT4 to LUT4.
 module randomized_lfsr_weak(input wire clk, input wire rst, output wire [WIDTH-1:0] out, output wire metastable);
 
-	parameter WIDTH = 'd16;
-	parameter INIT_VALUE = 16'b1010_1100_1110_0001;
-	parameter FEEDBACK = 16'b0000_0000_0010_1101;
+	parameter WIDTH = 'd8;
+	parameter INIT_VALUE = 8'b1100_1010;
+	parameter FEEDBACK = 8'b0001_1101;
 
 	wire random;
 	metastable_oscillator osci(metastable);
