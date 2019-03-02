@@ -51,9 +51,17 @@ module metastable_binary_debias(input wire clk, input wire metastable, output re
 
 endmodule
 
-// LFSR for random number generation that is seeded
-// from a metastable source. Yields bits at output_clk,
-// or fully independent words at output_word_clk.
+// LFSR for random number generation that is seeded from a metastable
+// source. Yields bits at output_clk, or fully independent words at
+// output_word_clk.
+// Output data usually passes tests of rngtest [1] and
+// NIST Entropy Assessment [2].
+// But don't hold me accountable. Entropy quality may heavily depend on FPGA
+// fabric, routing and other effects.
+//
+// [1] rngtest https://linux.die.net/man/1/rngtest
+// [2] NIST Entropy Assessment https://github.com/usnistgov/SP800-90B_EntropyAssessment
+//
 // Lattice ICE40 specific.
 // May also work for ECP5 when `defining SB_LUT4 to LUT4.
 module randomized_lfsr(input wire clk, input wire rst, output wire output_clk, output wire output_word_clk, output wire [WIDTH-1:0] out, output wire metastable);
@@ -78,6 +86,25 @@ module randomized_lfsr(input wire clk, input wire rst, output wire output_clk, o
 	metastable_oscillator_depth2 osci(metastable);
 	metastable_binary_debias debias(clk, metastable, output_clk, random);
 	lfsr #(.WIDTH(WIDTH), .INIT_VALUE(INIT_VALUE), .FEEDBACK(FEEDBACK)) shiftreg(output_clk, random, out, rst);
+
+endmodule
+
+// Like the randomized_lfsr, this generates random numbers.
+// But where randomized_lfsr tries to maximize entropy of
+// produced random numbers, the randomized_lfsr_weak tries to be very
+// small while still producing an acceptable amount of entropy
+// for jobs that don't depend on too much entropy.
+// Lattice ICE40 specific.
+// May also work for ECP5 when `defining SB_LUT4 to LUT4.
+module randomized_lfsr_weak(input wire clk, input wire rst, output wire [WIDTH-1:0] out, output wire metastable);
+
+	parameter WIDTH = 'd16;
+	parameter INIT_VALUE = 16'b1010_1100_1110_0001;
+	parameter FEEDBACK = 16'b0000_0000_0010_1101;
+
+	wire random;
+	metastable_oscillator osci(metastable);
+	lfsr #(.WIDTH(WIDTH), .INIT_VALUE(INIT_VALUE), .FEEDBACK(FEEDBACK)) shiftreg(clk, metastable, out, rst);
 
 endmodule
 
