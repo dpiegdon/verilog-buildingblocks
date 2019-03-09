@@ -1,3 +1,4 @@
+`default_nettype none
 
 module synchronous_reset_timer(input wire clk, output wire reset_out, input wire reset_in);
 

@@ -3,5 +3,6 @@
 *.json
 *.rpt
 *.bin
+*_tb.test
 *.swp
 .*.swp
