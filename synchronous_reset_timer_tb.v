@@ -27,7 +27,7 @@ module synchronous_reset_timer_tb();
 				$error("should reset but does not.");
 				errors = errors + 1;
 			end
-			#2;
+			@(negedge clk);
 		end
 		if(reset_out) begin
 			$error("should no longer reset but does.");
@@ -35,7 +35,7 @@ module synchronous_reset_timer_tb();
 		end
 
 		reset_in = 1;
-		#2;
+		@(negedge clk);
 		reset_in = 0;
 
 		for(i=0; i<LENGTH; i=i+1) begin
@@ -43,7 +43,7 @@ module synchronous_reset_timer_tb();
 				$error("should reset but does not.");
 				errors = errors + 1;
 			end
-			#2;
+			@(negedge clk);
 		end
 		if(reset_out) begin
 			$error("should no longer reset but does.");
