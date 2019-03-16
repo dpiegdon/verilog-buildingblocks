@@ -4,6 +4,8 @@
 // testbench for synchronous_reset_timer
 module synchronous_reset_timer_tb();
 
+	parameter LENGTH=7;
+
 	reg [20:0] clk;
 	reg reset_in;
 	integer errors;
@@ -11,7 +13,7 @@ module synchronous_reset_timer_tb();
 
 	wire reset_out;
 
-	synchronous_reset_timer dut(clk[0], reset_out, reset_in);
+	synchronous_reset_timer #(.LENGTH(LENGTH)) dut(clk[0], reset_out, reset_in);
 
 	always #1 clk = clk+1;
 	
@@ -20,7 +22,7 @@ module synchronous_reset_timer_tb();
 		reset_in = 0;
 		errors = 0;
 
-		for(i=0; i<3'b111; i=i+1) begin
+		for(i=0; i<LENGTH; i=i+1) begin
 			if(!reset_out) begin
 				$error("should reset but does not.");
 				errors = errors + 1;
@@ -36,7 +38,7 @@ module synchronous_reset_timer_tb();
 		#2;
 		reset_in = 0;
 
-		for(i=0; i<3'b111; i=i+1) begin
+		for(i=0; i<LENGTH; i=i+1) begin
 			if(!reset_out) begin
 				$error("should reset but does not.");
 				errors = errors + 1;
