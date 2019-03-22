@@ -16,4 +16,5 @@ run_tests: $(TESTS)
 
 clean:
 	-rm *_tb.test
+	-rm *_tb.vcd
 
