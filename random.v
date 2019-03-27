@@ -70,21 +70,21 @@ module randomized_lfsr(input wire clk, input wire rst, output wire bit_ready, ou
 	parameter INIT_VALUE = 16'b1010_1100_1110_0001;
 	parameter FEEDBACK = 16'b0000_0000_0010_1101;
 
-	reg [$clog2(WIDTH)-1:0] bit_clk = 0;
+	reg [$clog2(WIDTH)-1:0] bits_remaining = WIDTH;
 	reg previous_bit_ready = 0;
 
 	always @ (posedge clk) begin
 		if(rst || word_ready) begin
-			bit_clk <= WIDTH;
+			bits_remaining <= WIDTH-1;
 		end else begin
-			if(previous_bit_ready == 0 && bit_ready == 1) begin
-				bit_clk <= bit_clk - 1;
+			if(!previous_bit_ready && bit_ready) begin
+				bits_remaining <= bits_remaining - 1;
 			end
 		end
 		previous_bit_ready <= bit_ready;
 	end
 
-	assign word_ready = (bit_clk == 0);
+	assign word_ready = (bits_remaining == 0);
 
 	wire random;
 	metastable_oscillator_depth2 osci(metastable);
