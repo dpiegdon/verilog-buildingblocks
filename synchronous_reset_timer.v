@@ -9,9 +9,9 @@ module synchronous_reset_timer(input wire clk, output wire reset_out, input wire
 
 	always @(posedge clk, posedge reset_in) begin
 		if(reset_in) begin
-			timer = LENGTH;
+			timer <= LENGTH;
 		end else if(reset_out) begin
-			timer = timer - 1;
+			timer <= timer - 1;
 		end
 	end
 
