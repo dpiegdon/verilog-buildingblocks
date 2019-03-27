@@ -70,7 +70,7 @@ module randomized_lfsr(input wire clk, input wire rst, output wire bit_ready, ou
 	parameter INIT_VALUE = 16'b1010_1100_1110_0001;
 	parameter FEEDBACK = 16'b0000_0000_0010_1101;
 
-	reg [$clog2(WIDTH)-1:0] bits_remaining = WIDTH;
+	reg [$clog2(WIDTH)-1:0] bits_remaining = WIDTH-1;
 	reg previous_bit_ready = 0;
 
 	always @ (posedge clk) begin
