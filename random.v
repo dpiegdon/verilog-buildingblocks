@@ -36,13 +36,13 @@ endmodule
 
 // Remove a simple statistical bias in a random stream,
 // by XORing the stream with itself offset by one bit.
-module metastable_binary_debias(input wire clk, input wire metastable, output reg output_clk, output reg random);
+module metastable_binary_debias(input wire clk, input wire metastable, output reg bit_ready, output reg random);
 
 	reg last_random;
 
 	always @ (posedge clk) begin
-		output_clk <= output_clk+1;
-		if(output_clk) begin
+		bit_ready <= bit_ready+1;
+		if(bit_ready) begin
 			random <= !metastable ^ last_random;
 		end else begin
 			last_random <= metastable;
@@ -52,8 +52,8 @@ module metastable_binary_debias(input wire clk, input wire metastable, output re
 endmodule
 
 // LFSR for random number generation that is seeded from a metastable
-// source. Yields bits at output_clk, or fully independent words at
-// output_word_clk.
+// source. Yields bits at bit_ready, or fully independent words at
+// word_ready.
 // Output data usually passes tests of rngtest [1] and
 // NIST Entropy Assessment [2].
 // But don't hold me accountable. Entropy quality may heavily depend on FPGA
@@ -64,28 +64,32 @@ endmodule
 //
 // Lattice ICE40 specific.
 // May also work for ECP5 when `defining SB_LUT4 to LUT4.
-module randomized_lfsr(input wire clk, input wire rst, output wire output_clk, output wire output_word_clk, output wire [WIDTH-1:0] out, output wire metastable);
+module randomized_lfsr(input wire clk, input wire rst, output wire bit_ready, output wire word_ready, output wire [WIDTH-1:0] out, output wire metastable);
 
 	parameter WIDTH = 'd16;
 	parameter INIT_VALUE = 16'b1010_1100_1110_0001;
 	parameter FEEDBACK = 16'b0000_0000_0010_1101;
 
-	reg [$clog2(WIDTH)-1:0] word_clk = 0;
+	reg [$clog2(WIDTH)-1:0] bit_clk = 0;
+	reg previous_bit_ready = 0;
 
-	always @ (posedge output_clk) begin
-		if(rst) begin
-			word_clk = 0;
+	always @ (posedge clk) begin
+		if(rst || word_ready) begin
+			bit_clk <= WIDTH;
 		end else begin
-			word_clk = word_clk + 1;
+			if(previous_bit_ready == 0 && bit_ready == 1) begin
+				bit_clk <= bit_clk - 1;
+			end
 		end
+		previous_bit_ready <= bit_ready;
 	end
 
-	assign output_word_clk = !(|word_clk);
+	assign word_ready = (bit_clk == 0);
 
 	wire random;
 	metastable_oscillator_depth2 osci(metastable);
-	metastable_binary_debias debias(clk, metastable, output_clk, random);
-	lfsr #(.WIDTH(WIDTH), .INIT_VALUE(INIT_VALUE), .FEEDBACK(FEEDBACK)) shiftreg(output_clk, random, out, rst);
+	metastable_binary_debias debias(clk, metastable, bit_ready, random);
+	lfsr #(.WIDTH(WIDTH), .INIT_VALUE(INIT_VALUE), .FEEDBACK(FEEDBACK)) shiftreg(bit_ready, random, out, rst);
 
 endmodule
 
