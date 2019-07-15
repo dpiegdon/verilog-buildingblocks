@@ -11,31 +11,33 @@
  * The charlieplex hardware is expected to look like a generalized version
  * of the following 4-pin example. I.e. it is a NxN matrix for N outputs.
  *
- *   OUT0     OUT1     OUT2     OUT3
- *   |        |        |        |
- *   x---x    x---x    x---x    x---x
- *   |   |    |   |    |   |    |   |
- *   |   ▓    |   ▼3   |   ▼6   |   ▼9
- *   |   |    |   |    |   |    |   |
- *   |   x----|---x----|---x----|---x
- *   |        |        |        |
- *   x---x    x---x    x---x    x---x
- *   |   |    |   |    |   |    |   |
- *   |   ▼0   |   ▓    |   ▼7   |   ▼10
- *   |   |    |   |    |   |    |   |
- *   |   x----|---x----|---x----|---x
- *   |        |        |        |
- *   x---x    x---x    x---x    x---x
- *   |   |    |   |    |   |    |   |
- *   |   ▼1   |   ▼4   |   ▓    |   ▼11
- *   |   |    |   |    |   |    |   |
- *   |   x----|---x----|---x----|---x
- *   |        |        |        |
- *   x---x    x---x    x---x    x---x
+ *          X=0      X=1      X=2      X=3
+ *
+ *       OUT0     OUT1     OUT2     OUT3
  *       |        |        |        |
- *       ▼2       ▼5       ▼8      ▓
+ *       x---x    x---x    x---x    x---x
+ *       |   |    |   |    |   |    |   |
+ *  Y=0  |   ▓    |   ▼3   |   ▼6   |   ▼9
+ *       |   |    |   |    |   |    |   |
+ *       |   x----|---x----|---x----|---x
  *       |        |        |        |
- *       x--------x--------x--------x
+ *       x---x    x---x    x---x    x---x
+ *       |   |    |   |    |   |    |   |
+ *  Y=1  |   ▼0   |   ▓    |   ▼7   |   ▼10
+ *       |   |    |   |    |   |    |   |
+ *       |   x----|---x----|---x----|---x
+ *       |        |        |        |
+ *       x---x    x---x    x---x    x---x
+ *       |   |    |   |    |   |    |   |
+ *  Y=2  |   ▼1   |   ▼4   |   ▓    |   ▼11
+ *       |   |    |   |    |   |    |   |
+ *       |   x----|---x----|---x----|---x
+ *       |        |        |        |
+ *       x---x    x---x    x---x    x---x
+ *           |        |        |        |
+ *  Y=3      ▼2       ▼5       ▼8       ▓
+ *           |        |        |        |
+ *           x--------x--------x--------x
  *
  *   Where
  *      ▓   is a current-limiting resistor as needed to drive
