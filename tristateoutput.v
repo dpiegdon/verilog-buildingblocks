@@ -1,7 +1,7 @@
 `default_nettype none
 
 // Simplification of tristate output module on Lattice HX/LP parts.
-module TristateOutput(
+module tristate_output(
 	input pin,
 	input wire enable,
 	input wire value);
