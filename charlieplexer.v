@@ -15,25 +15,25 @@
  *   |        |        |        |
  *   x---x    x---x    x---x    x---x
  *   |   |    |   |    |   |    |   |
- *   |   ▓    |   ▼0   |   ▼1   |   ▼2
+ *   |   ▓    |   ▼3   |   ▼6   |   ▼9
  *   |   |    |   |    |   |    |   |
  *   |   x----|---x----|---x----|---x
  *   |        |        |        |
  *   x---x    x---x    x---x    x---x
  *   |   |    |   |    |   |    |   |
- *   |   ▼3   |   ▓    |   ▼4   |   ▼5
+ *   |   ▼0   |   ▓    |   ▼7   |   ▼10
  *   |   |    |   |    |   |    |   |
  *   |   x----|---x----|---x----|---x
  *   |        |        |        |
  *   x---x    x---x    x---x    x---x
  *   |   |    |   |    |   |    |   |
- *   |   ▼6   |   ▼7   |   ▓    |   ▼8
+ *   |   ▼1   |   ▼4   |   ▓    |   ▼11
  *   |   |    |   |    |   |    |   |
  *   |   x----|---x----|---x----|---x
  *   |        |        |        |
  *   x---x    x---x    x---x    x---x
  *       |        |        |        |
- *       ▼9       ▼10      ▼11      ▓
+ *       ▼2       ▼5       ▼8      ▓
  *       |        |        |        |
  *       x--------x--------x--------x
  *
@@ -65,8 +65,8 @@ module charlieplexer(
 		begin
 			LedIndex = 0;
 			stop = 0;
-			for(iy = 0; iy < pinCount; iy++) begin
-				for(ix = 0; ix < pinCount; ix++) begin
+			for(ix = 0; ix < pinCount; ix++) begin
+				for(iy = 0; iy < pinCount; iy++) begin
 					if((ix != iy) && (stop == 0)) begin
 						if((x == ix) && (y == iy)) begin
 							stop = 1;
