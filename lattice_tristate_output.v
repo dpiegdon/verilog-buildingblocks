@@ -1,7 +1,8 @@
 `default_nettype none
 
-// Simplification of tristate output module on Lattice HX/LP parts.
-module tristate_output(
+// Lattice ice40 specific.
+// Simplification of tristate output module on Lattice ice40 parts.
+module lattice_tristate_output(
 	input pin,
 	input wire enable,
 	input wire value);
