@@ -13,11 +13,11 @@ module lattice_debounced_button(
 
 	wire pin_value;
 
-	lattice_pullup_input input_pin(in, pin_value);
+	lattice_pullup_input input_pin(.pin(in), .value(pin_value));
 
 	debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES),
 		.CLOCKED_EDGE_OUT(CLOCKED_EDGE_OUT))
-		input_debouncer(clk, pin_value, out);
+		input_debouncer(.clk(clk), .in(pin_value), .out(out));
 
 endmodule
 
