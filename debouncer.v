@@ -30,14 +30,18 @@ module debouncer(
 				decay <= decay - 1;
 				if(decay == 0) begin
 					running <= 0;
-					out <= in;
+					if(CLOCKED_EDGE_OUT) begin
+						out <= (INPUT_WHEN_IDLE) ? ~in : in;
+					end else begin
+						out <= in;
+					end
 				end else begin
-					if(CLOCKED_EDGE_OUT == 1) begin
+					if(CLOCKED_EDGE_OUT) begin
 						out <= 0;
 					end
 				end
 			end else begin
-				if(CLOCKED_EDGE_OUT == 1) begin
+				if(CLOCKED_EDGE_OUT) begin
 					out <= 0;
 				end
 			end
