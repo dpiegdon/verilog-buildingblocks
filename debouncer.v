@@ -32,12 +32,12 @@ module debouncer(
 					running <= 0;
 					out <= in;
 				end else begin
-					if(CLOCKED_EDGE_OUT == 0) begin
+					if(CLOCKED_EDGE_OUT == 1) begin
 						out <= 0;
 					end
 				end
 			end else begin
-				if(CLOCKED_EDGE_OUT == 0) begin
+				if(CLOCKED_EDGE_OUT == 1) begin
 					out <= 0;
 				end
 			end
