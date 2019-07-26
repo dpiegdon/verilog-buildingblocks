@@ -2,7 +2,7 @@
 
 // Lattice ice40 specific.
 // Fully debounced button with an internal pull-up.
-// Just connect a switch to the pin that would pull it to GND.
+// Connect a switch to the pin that pulls it to GND when pressed.
 module lattice_debounced_button(
 	input wire clk,
 	input wire in,

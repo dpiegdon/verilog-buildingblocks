@@ -1,6 +1,6 @@
 `default_nettype none
 
-// demuxer module. Untested and never used so far.
+// demuxer module. NOTE: UNTESTED AND NEVER USED SO FAR.
 module demux(input wire [INPUT_WIDTH-1:0] in, output wire [OUTPUT_WIDTH-1:0] out);
 	parameter OUTPUT_WIDTH = 'd3;
 
