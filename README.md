@@ -38,9 +38,18 @@ Contains
 * `uart.v`
   UART module by Timothy Goddard that can be found in various places on the internet, with some changes by me to add high speed capability.
 
-Contains also testbenches (`*_tb.v`) for some of these modules.
+Contains also testbenches (`*_tb.v`) for some of the modules, see below.
 
 Note: most of the implementation-specific modules should be easily adaptable to other platforms.
+
+
+Testbenches
+-----------
+
+Some of the modules have a testbench (`*_tb.v`). Testbenches are
+optimizes for use with the Icarus Verilog compiler. To run all tests,
+just run `make`. The build is successfull if and only if all testbenches
+were able to build and succeeded.
 
 
 Authors
