@@ -6,7 +6,7 @@ TESTS=$(TESTBENCHES:%.v=%.test)
 
 
 %_tb.test: %_tb.v %.v
-	iverilog -o $@ $^
+	@iverilog -o $@ $^
 
 run_tests: $(TESTS)
 	@for test in $^; do \
@@ -15,6 +15,6 @@ run_tests: $(TESTS)
 	done
 
 clean:
-	-rm *_tb.test
-	-rm *_tb.vcd
+	@-rm -f *_tb.test
+	@-rm -f *_tb.vcd
 
