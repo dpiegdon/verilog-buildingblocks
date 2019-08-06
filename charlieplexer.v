@@ -88,8 +88,8 @@ module charlieplexer(
 
 	generate
 		genvar x, y;
-		for(y = 0; y < PINCOUNT; y++) begin
-			for(x = 0; x < PINCOUNT; x++) begin
+		for(y = 0; y < PINCOUNT; y=y+1) begin
+			for(x = 0; x < PINCOUNT; x=x+1) begin
 				if(x != y) begin
 					assign grid[x][y] = (in == LedIndex(x, y, PINCOUNT));
 					assign out_vcc[x] = grid[x][y];
