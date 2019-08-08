@@ -56,8 +56,14 @@ module charlieplexer_tb();
 		integer errors;
 		integer i;
 		integer count;
+		integer grid [PINCOUNT-1:0] [PINCOUNT-1:0];
+		integer vcc, gnd;
 
 		errors = 0;
+
+		for(vcc=0; vcc<PINCOUNT; vcc=vcc+1)
+			for(gnd=0; gnd<PINCOUNT; gnd=gnd+1)
+				grid[vcc][gnd] = 0;
 
 		// the following loop does a few simple checks:
 		// for any (valid) input:
@@ -102,6 +108,11 @@ module charlieplexer_tb();
 				errors = errors+1;
 			end
 
+			// remember which combinations were hit
+			vcc = $clog2(highmask);
+			gnd = $clog2(lowmask);
+			grid[vcc][gnd] = grid[vcc][gnd] + 1;
+
 			#1;
 
 			dut_enable = 0;
@@ -112,14 +123,27 @@ module charlieplexer_tb();
 				$error("device disabled but pin enabled.");
 				errors = errors+1;
 			end
+		end
 
-			/* NOTE XXX
-			 * possible extension:
-			 * create a memory of which high/low combinations were
-			 * reached. each possible combination must be reached
-			 * exactly once in the end.
-			 * (i.e. all except for those where HIGH=LOW.)
-			 */
+		/*
+		 * check that:
+		 *   - all correct combinations (vcc!=gnd) were hit exactly once
+		 *   - all invalid (vcc==gnd) were not hit.
+		 */
+		for(vcc=0; vcc<PINCOUNT; vcc=vcc+1) begin
+			for(gnd=0; gnd<PINCOUNT; gnd=gnd+1) begin
+				if(vcc == gnd) begin
+					if(grid[vcc][gnd] != 0) begin
+						$error("invalid combination hit: (vcc %0d, gnd %0d)", vcc, gnd);
+						errors = errors + 1;
+					end
+				end else begin
+					if(grid[vcc][gnd] != 1) begin
+						$error("combination hit %0d times, should have been once: (vcc %0d, gnd %0d)", vcc, gnd);
+						errors = errors + 1;
+					end
+				end
+			end
 		end
 
 		if(errors == 0)
