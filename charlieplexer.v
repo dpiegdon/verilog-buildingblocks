@@ -78,24 +78,10 @@ module charlieplexer(
 
 	function [INDEXBITS-1:0] LedIndex(input integer x, input integer y, input integer pinCount);
 		// Returns the index of the LED at grid-position x/y.
-		// This is a stupid solution, but I am not very versatile with
-		// verilog so far, so I did not really come up with a better
-		// solution.
-		integer ix, iy, stop;
-		begin
-			LedIndex = 0;
-			stop = 0;
-			for(ix = 0; ix < pinCount; ix++) begin
-				for(iy = 0; iy < pinCount; iy++) begin
-					if((ix != iy) && (stop == 0)) begin
-						if((x == ix) && (y == iy)) begin
-							stop = 1;
-						end else begin
-							LedIndex = LedIndex+1;
-						end
-					end
-				end
-			end
+		if(x > y) begin
+			LedIndex = (pinCount-1)*x + y;
+		end else begin
+			LedIndex = (pinCount-1)*x + y-1;
 		end
 	endfunction
 

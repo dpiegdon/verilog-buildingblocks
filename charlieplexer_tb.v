@@ -21,7 +21,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 // testbench for charlieplexer.
 module charlieplexer_tb();
-	localparam PINCOUNT=17;
+	localparam PINCOUNT=33;
 	localparam INDEXBITS=$clog2(PINCOUNT * (PINCOUNT-1));
 
 
