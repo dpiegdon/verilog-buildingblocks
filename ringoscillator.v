@@ -32,6 +32,7 @@ module ringoscillator(output wire out);
 
 	// Single LUT delay line. This also takes care that the compiler
 	// (yosys) is not removing this logic path.
+	(* keep *)
 	SB_LUT4 #(
 		.LUT_INIT(16'd2)
 	) buffers (
@@ -58,6 +59,7 @@ module ringoscillator_minimal_delay(output wire out);
 
 	// Single LUT delay line. This also takes care that the compiler
 	// (yosys) is not removing this logic path.
+	(* keep *)
 	SB_LUT4 #(
 		.LUT_INIT(16'd1)
 	) buffers (
