@@ -24,13 +24,16 @@
  *
  *
  * ChangeLog
+ *	2019-08-15	removed tx_free signal again,
+ *	(dpiegdon)	it is the same as the negated is_transmitting signal...
+	 *
  *	2017-11-22	revisited original upstream: https://opencores.org/project,osdvu
- *  	(dpiegdon)	and adapted it to supply tx_free signal.
+ *	(dpiegdon)	and adapted it to supply tx_free signal.
  *
- *  			halved required clock cycles to support high baudrates
- *  			with low system clock.
+ *			halved required clock cycles to support high baudrates
+ *			with low system clock.
  *
- *  			set baudrate to upper limit of 12M. (limit is FT2232H)
+ *			set baudrate to upper limit of 12M. (limit is FT2232H)
  *
  *	2019-02-20	code- and style-cleanup
  *	(dpiegdon)
@@ -44,7 +47,6 @@ module uart(
 	input  wire rx,			// Incoming serial line
 	output wire tx,			// Outgoing serial line
 	input  wire transmit,		// Signal to transmit
-	output wire tx_free,		// Transmitter is idle
 	input  wire [7:0] tx_byte,	// Byte to transmit
 	output wire received,		// Indicated that a byte has been received.
 	output wire [7:0] rx_byte,	// Byte received
@@ -91,7 +93,6 @@ module uart(
 	reg [3:0] tx_bits_remaining;
 	reg [7:0] tx_data;
 
-	assign tx_free = (tx_state == TX_IDLE);
 	assign received = (recv_state == RX_RECEIVED);
 	assign recv_error = (recv_state == RX_ERROR);
 	assign is_receiving = (recv_state != RX_IDLE);
