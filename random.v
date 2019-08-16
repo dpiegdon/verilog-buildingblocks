@@ -30,6 +30,7 @@ module metastable_oscillator(output wire metastable);
 	ringoscillator r2(s2);
 	ringoscillator r3(s3);
 
+	(* keep *)
 	SB_LUT4 #(.LUT_INIT(16'b1010_1100_1110_0001))
 		destabilizer (.O(metastable), .I0(s0), .I1(s1), .I2(s2), .I3(s3));
 
@@ -47,6 +48,7 @@ module metastable_oscillator_depth2(output wire metastable);
 	metastable_oscillator r2(s2);
 	metastable_oscillator r3(s3);
 
+	(* keep *)
 	SB_LUT4 #(.LUT_INIT(16'b0101_0011_0001_1110))
 		destabilizer (.O(metastable), .I0(s0), .I1(s1), .I2(s2), .I3(s3));
 	
