@@ -20,7 +20,6 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 // Circuit generating a metastable output.
 module metastable_oscillator(output wire metastable);
-
 	wire s0, s1, s2, s3;
 
 	ringoscillator r0(s0);
@@ -31,12 +30,10 @@ module metastable_oscillator(output wire metastable);
 	(* keep *)
 	SB_LUT4 #(.LUT_INIT(16'b1010_1100_1110_0001))
 		destabilizer (.O(metastable), .I0(s0), .I1(s1), .I2(s2), .I3(s3));
-
 endmodule
 
 // Circuit generating an even more metastable output.
 module metastable_oscillator_depth2(output wire metastable);
-
 	wire s0, s1, s2, s3;
 
 	metastable_oscillator r0(s0);
@@ -47,6 +44,5 @@ module metastable_oscillator_depth2(output wire metastable);
 	(* keep *)
 	SB_LUT4 #(.LUT_INIT(16'b0101_0011_0001_1110))
 		destabilizer (.O(metastable), .I0(s0), .I1(s1), .I2(s2), .I3(s3));
-	
 endmodule
 

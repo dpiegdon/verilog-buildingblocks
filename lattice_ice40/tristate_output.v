@@ -18,13 +18,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 `default_nettype none
 
-// Lattice ice40 specific.
-// Simplification of tristate output module on Lattice ice40 parts.
-module tristate_output(
-	input pin,
-	input wire enable,
-	input wire value);
-
+// Implementation of tristateable output.
+module tristate_output(input pin, input wire enable, input wire value);
 	SB_IO #(
 		.PIN_TYPE(6'b1010_01),
 		.PULLUP(1'b0),

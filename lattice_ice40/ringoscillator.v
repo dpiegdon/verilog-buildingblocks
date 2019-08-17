@@ -42,6 +42,5 @@ module ringoscillator(output wire chain_out);
 				chain_lut(.O(chain_wire[i+1]), .I0(chain_wire[i]), .I1(1'b0), .I2(1'b0), .I3(1'b0));
 		end
 	endgenerate
-	
 endmodule
 

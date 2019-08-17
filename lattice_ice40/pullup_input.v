@@ -18,12 +18,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 `default_nettype none
 
-// Lattice ice40 specific.
-// Simplification of input with pullup on Lattice ice40 parts.
-module pullup_input(
-	input pin,
-	output wire value);
-
+// Implementation of input with pullup.
+module pullup_input(input pin, output wire value);
 	SB_IO #(
 		.PIN_TYPE(6'b0000_01),
 		.PULLUP(1'b1),
