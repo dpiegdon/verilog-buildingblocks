@@ -20,7 +20,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 // Lattice ice40 specific.
 // Simplification of tristate output module on Lattice ice40 parts.
-module lattice_tristate_output(
+module tristate_output(
 	input pin,
 	input wire enable,
 	input wire value);

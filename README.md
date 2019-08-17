@@ -5,6 +5,9 @@ Various verilog modules that I use or develop
 Contains
 --------
 
+* `binary_debias.v`
+  Module to XOR two bits in a bistream into one. Used to remove a binary debias in a random stream.
+
 * `charlieplexer.v`
   Generic charlieplexing module for N pins to control N*(N-1) LEDs.
 
@@ -14,29 +17,35 @@ Contains
 * `demux.v`
   Generic demultiplexer.
 
-* `lattice_debounced_button.v`
-  Lattice-specific implementation of a proper debounced button from an input pin.
-
-* `lattice_pullup_input.v`
-  Lattice-specific implementation of an input with pullup.
-
-* `lattice_tristate_output.v`
-  Lattice-specific implementation of a tristateable output.
-
 * `lfsr.v`
   Generic linear feedback shift register (LFSR).
 
 * `random.v`
-  Mostly lattice-specific code to generate random numbers from metastability.
+  Modules to generate metastable output and random numbers.
 
-* `ringoscillator.v`
-  Lattice-specific ring oscillator implementation.
-  
 * `synchronous_reset_timer.v`
   Module to synchronize an sync reset signal to a clock domain and hold it for a defined number of clock cycles.
 
 * `uart.v`
   UART module by Timothy Goddard that can be found in various places on the internet, with some changes by me to add high speed capability.
+
+* Lattice iCE40 specific implementations (in `lattice_ice40/`)
+
+ - `lattice_ice40/debounced_button.v`
+  Debounced button from an input pin.
+
+ - `lattice_ice40/pullup_input.v`
+  Input with pullup.
+
+ - `lattice_ice40/random.v`
+  Modules for random number generation.
+  
+ - `lattice_ice40/ringoscillator.v`
+  Ring oscillator implementation.
+
+ - `lattice_ice40/tristate_output.v`
+  A tristateable output.
+
 
 Contains also testbenches (`*_tb.v`) for some of the modules, see below.
 

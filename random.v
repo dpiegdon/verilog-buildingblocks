@@ -18,59 +18,6 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 `default_nettype none
 
-// Circuit generating a metastable output.
-// Lattice ICE40 specific.
-// May also work for ECP5 when `defining SB_LUT4 to LUT4.
-module metastable_oscillator(output wire metastable);
-
-	wire s0, s1, s2, s3;
-
-	ringoscillator r0(s0);
-	ringoscillator r1(s1);
-	ringoscillator r2(s2);
-	ringoscillator r3(s3);
-
-	(* keep *)
-	SB_LUT4 #(.LUT_INIT(16'b1010_1100_1110_0001))
-		destabilizer (.O(metastable), .I0(s0), .I1(s1), .I2(s2), .I3(s3));
-
-endmodule
-
-// Circuit generating an even more metastable output.
-// Lattice ICE40 specific.
-// May also work for ECP5 when `defining SB_LUT4 to LUT4.
-module metastable_oscillator_depth2(output wire metastable);
-
-	wire s0, s1, s2, s3;
-
-	metastable_oscillator r0(s0);
-	metastable_oscillator r1(s1);
-	metastable_oscillator r2(s2);
-	metastable_oscillator r3(s3);
-
-	(* keep *)
-	SB_LUT4 #(.LUT_INIT(16'b0101_0011_0001_1110))
-		destabilizer (.O(metastable), .I0(s0), .I1(s1), .I2(s2), .I3(s3));
-	
-endmodule
-
-// Remove a simple statistical bias in a random stream,
-// by XORing the stream with itself offset by one bit.
-module metastable_binary_debias(input wire clk, input wire metastable, output reg bit_ready, output reg random);
-
-	reg last_random;
-
-	always @ (posedge clk) begin
-		bit_ready <= bit_ready+1;
-		if(bit_ready) begin
-			random <= !metastable ^ last_random;
-		end else begin
-			last_random <= metastable;
-		end
-	end
-
-endmodule
-
 // LFSR for random number generation that is seeded from a metastable
 // source. Yields bits at bit_ready, or fully independent words at
 // word_ready.
@@ -81,9 +28,6 @@ endmodule
 //
 // [1] rngtest https://linux.die.net/man/1/rngtest
 // [2] NIST Entropy Assessment https://github.com/usnistgov/SP800-90B_EntropyAssessment
-//
-// Lattice ICE40 specific.
-// May also work for ECP5 when `defining SB_LUT4 to LUT4.
 module randomized_lfsr(input wire clk, input wire rst, output wire bit_ready, output wire word_ready, output wire [WIDTH-1:0] out, output wire metastable);
 
 	parameter WIDTH = 'd16;
@@ -108,7 +52,7 @@ module randomized_lfsr(input wire clk, input wire rst, output wire bit_ready, ou
 
 	wire random;
 	metastable_oscillator_depth2 osci(metastable);
-	metastable_binary_debias debias(clk, metastable, bit_ready, random);
+	binary_debias debias(clk, metastable, bit_ready, random);
 	lfsr #(.WIDTH(WIDTH), .INIT_VALUE(INIT_VALUE), .FEEDBACK(FEEDBACK)) shiftreg(bit_ready, random, out, rst);
 
 endmodule
@@ -118,8 +62,6 @@ endmodule
 // produced random numbers, the randomized_lfsr_weak tries to be very
 // small while still producing an acceptable amount of entropy
 // for jobs that don't depend on too much entropy.
-// Lattice ICE40 specific.
-// May also work for ECP5 when `defining SB_LUT4 to LUT4.
 module randomized_lfsr_weak(input wire clk, input wire rst, output wire [WIDTH-1:0] out, output wire metastable);
 
 	parameter WIDTH = 'd8;

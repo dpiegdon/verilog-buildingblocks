@@ -19,23 +19,17 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 
 // Lattice ice40 specific.
-// Fully debounced button with an internal pull-up.
-// Connect a switch to the pin that pulls it to GND when pressed.
-module lattice_debounced_button(
-	input wire clk,
-	input wire in,
-	output wire out);
+// Simplification of input with pullup on Lattice ice40 parts.
+module pullup_input(
+	input pin,
+	output wire value);
 
-	parameter DEBOUNCE_CYCLES = 100;
-	parameter CLOCKED_EDGE_OUT = 0;
-
-	wire pin_value;
-
-	lattice_pullup_input input_pin(.pin(in), .value(pin_value));
-
-	debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES),
-		.CLOCKED_EDGE_OUT(CLOCKED_EDGE_OUT))
-		input_debouncer(.clk(clk), .in(pin_value), .out(out));
-
+	SB_IO #(
+		.PIN_TYPE(6'b0000_01),
+		.PULLUP(1'b1),
+	) sb_io (
+		.PACKAGE_PIN(pin),
+		.D_IN_0(value),
+	);
 endmodule
 
