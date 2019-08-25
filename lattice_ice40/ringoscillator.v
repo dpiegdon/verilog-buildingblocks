@@ -37,7 +37,7 @@ module ringoscillator(output wire chain_out);
 	generate
 		genvar i;
 		for(i=0; i<=DELAY_LUTS; i=i+1) begin: delayline
-			(* keep *)
+			(* keep *) (* noglobal *)
 			SB_LUT4 #(.LUT_INIT((i==0)?16'd1:16'd2))
 				chain_lut(.O(chain_wire[i+1]), .I0(chain_wire[i]), .I1(1'b0), .I2(1'b0), .I3(1'b0));
 		end
