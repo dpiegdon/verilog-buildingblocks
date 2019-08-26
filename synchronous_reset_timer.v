@@ -22,7 +22,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 module synchronous_reset_timer(input wire clk, output wire reset_out, input wire reset_in);
 	parameter LENGTH=7;
 
-	reg [$clog2(LENGTH)-1:0] timer = LENGTH;
+	reg [$clog2(LENGTH+1)-1:0] timer = LENGTH;
 	assign reset_out = |timer;
 
 	always @(posedge clk, posedge reset_in) begin

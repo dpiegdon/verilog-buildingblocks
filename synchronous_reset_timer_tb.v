@@ -20,7 +20,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `timescale 1ns / 1ps
 
 // testbench for synchronous_reset_timer
-module synchronous_reset_timer_tb();
+
+module single_synchronous_reset_timer_tb();
 
 	parameter LENGTH=7;
 
@@ -42,12 +43,14 @@ module synchronous_reset_timer_tb();
 
 		for(i=0; i<LENGTH; i=i+1) begin
 			if(!reset_out) begin
+				$error("with LENGTH %d:", LENGTH);
 				$error("should reset but does not.");
 				errors = errors + 1;
 			end
 			@(negedge clk);
 		end
 		if(reset_out) begin
+			$error("with LENGTH %d:", LENGTH);
 			$error("should no longer reset but does.");
 			errors = errors + 1;
 		end
@@ -58,12 +61,14 @@ module synchronous_reset_timer_tb();
 
 		for(i=0; i<LENGTH; i=i+1) begin
 			if(!reset_out) begin
+				$error("with LENGTH %d:", LENGTH);
 				$error("should reset but does not.");
 				errors = errors + 1;
 			end
 			@(negedge clk);
 		end
 		if(reset_out) begin
+			$error("with LENGTH %d:", LENGTH);
 			$error("should no longer reset but does.");
 			errors = errors + 1;
 		end
@@ -76,3 +81,13 @@ module synchronous_reset_timer_tb();
 
 endmodule
 
+module synchronous_reset_timer_tb();
+
+	generate
+		genvar i;
+		for(i=3; i<33; i=i+1) begin: reset_tests
+			single_synchronous_reset_timer_tb #(.LENGTH(i)) dut();
+		end
+	endgenerate
+
+endmodule
