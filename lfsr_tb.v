@@ -21,7 +21,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 // testbench for lfsr.
 module lfsr_tb();
-	localparam ITERATIONS=16'h5;
+	localparam ITERATIONS=1001;
 
 	reg [20:0] clock_counter;
 	wire clk;
@@ -44,31 +44,68 @@ module lfsr_tb();
 
 
 	initial begin
-		clock_counter = 0;
-		random = 0;
-		rst = 0;
 		errors = 0;
-		whitelist[0] = 16'hACE1;
-		for(i=1; i<ITERATIONS; i=i+1) begin
+
+		// generate whitelist against which we compare.
+		whitelist[1] = 16'hACE1;
+		for(i=2; i<ITERATIONS; i=i+1) begin
 			old = whitelist[i-1];
 			feedback = old[0] ^ old[2] ^ old[3] ^ old[5];
 			whitelist[i] = { feedback, old[15:1] };
 		end
 
+		if(whitelist[1000] != 16'hf973) begin
+			$error("TEST is broken:");
+			$error(" known-good value for iteration 1000 is 0xf973,");
+			$error(" but test-calc did yield: 0x%04x", whitelist[1000]);
+			errors = errors+1;
+		end
+
+
+		// reset DUT
+		clock_counter = 0;
+		random = 0;
+		rst = 1;
+		@(negedge clk);
+		rst = 0;
+		@(negedge clk);
+
+		// check first thousand or so values
 		while(iteration < ITERATIONS) begin
-			known_good = whitelist[iteration];
-			if (known_good != shiftreg) begin
-				$error("iteration %d: output 0x%04x != 0x%04x expected",
-					iteration,
-					whitelist[iteration],
-					shiftreg);
-				errors = errors+1;
+			if (whitelist[iteration] == shiftreg) begin
+				// nothing.
 			end else begin
-				$display("iteration %d ok.", iteration);
+				$error("iteration %d: output 0x%04x != 0x%04x expected",
+					iteration, shiftreg, whitelist[iteration]);
+				errors = errors+1;
 			end
 			@(negedge clk);
 		end
 
+		// make sure there were iterations
+		if(iteration < ITERATIONS) begin
+			$error("TEST is broken: next iteration would only be %d.", iteration);
+		end
+
+		while(shiftreg == 16'b1010_1100_1110_0001) begin
+			$error("stall rquired: 0x%04x", shiftreg);
+			errors = errors+1;
+			@(negedge clk);
+		end;
+
+		// test reset behaviour
+		rst = 1;
+		@(negedge clk);
+		rst = 0;
+
+		if(shiftreg != 16'b1010_1100_1110_0001) begin
+			$error("reset does not work: should be 0x%04x but is 0x%04x",
+				16'b1010_1100_1110_0001,
+				shiftreg);
+			errors = errors+1;
+		end
+
+		// fini.
 		if(errors == 0)
 			$finish;
 		else

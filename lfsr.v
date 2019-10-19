@@ -32,12 +32,12 @@ module lfsr(input wire clk, input wire random, output reg [WIDTH-1:0] shiftreg, 
 
 	assign feedback = random ^ (^(shiftreg & FEEDBACK));
 
-	always @ (posedge clk) begin
-		if(init_done || rst) begin
-			shiftreg <= {feedback, shiftreg[WIDTH-1:1]};
-		end else begin
+	always @(posedge clk) begin
+		if(rst || !init_done) begin
 			shiftreg <= INIT_VALUE;
 			init_done <= 1;
+		end else begin
+			shiftreg <= {feedback, shiftreg[WIDTH-1:1]};
 		end
 	end
 
