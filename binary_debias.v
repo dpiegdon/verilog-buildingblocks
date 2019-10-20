@@ -19,7 +19,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 
 // Remove a simple statistical bias in a random stream,
-// by XORing two consecutive bits into one.
+// by XORing two consecutive bits into one, with one of them negated.
 module binary_debias(input wire clk, input wire metastable, output reg bit_ready, output reg random);
 
 	reg last_random;
