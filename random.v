@@ -21,13 +21,33 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 // LFSR for random number generation that is seeded from a metastable
 // source. Yields bits at bit_ready, or fully independent words at
 // word_ready.
-// Output data usually passes tests of rngtest [1] and
+// this randomness source should not be treated as cryptographically secure.
+// it has a few known issues:
+//
+//  * it leaks internal state (via `out`). if at each `word_ready` indication
+//    the full or partial state is used, an attacker might be able to
+//    recalculate the full input stream and thus the full random stream from
+//    parts of it. it would be better to only use at most a few bits per
+//    `word_ready`
+//  * a statistical bias in the generated metastable signal (p(0) != 0.5) is
+//    not canceled perfectly in favour of having a predictable output
+//    quantity. see [3] for a better solution.
+//  * a simple linear feedback shift register is not a cryptographically
+//    sound hash function. better use something in between `md5` and `sha512`.
+//
+// None the less, output data usually passes tests of rngtest [1] and
 // NIST Entropy Assessment [2].
 // But don't hold me accountable. Entropy quality may heavily depend on FPGA
-// fabric, routing and other effects.
+// fabric, routing, other effects and the above mentioned algorithmic issues.
 //
-// [1] rngtest https://linux.die.net/man/1/rngtest
-// [2] NIST Entropy Assessment https://github.com/usnistgov/SP800-90B_EntropyAssessment
+// [1] rngtest
+//     https://linux.die.net/man/1/rngtest
+//
+// [2] NIST Entropy Assessment
+//     https://github.com/usnistgov/SP800-90B_EntropyAssessment
+//
+// [3] von Neumann method for debiasing random data
+//     https://mcnp.lanl.gov/pdf_files/nbs_vonneumann.pdf
 module randomized_lfsr(input wire clk, input wire rst, output wire bit_ready, output wire word_ready, output wire [WIDTH-1:0] out, output wire metastable);
 
 	parameter WIDTH = 'd16;
@@ -59,7 +79,8 @@ endmodule
 
 // Like the randomized_lfsr, this generates random numbers.
 // But where randomized_lfsr tries to maximize entropy of
-// produced random numbers, the randomized_lfsr_weak tries to be very
+// produced random numbers for the given input data and constraints,
+// the randomized_lfsr_weak tries to be very
 // small while still producing an acceptable amount of entropy
 // for jobs that don't depend on too much entropy.
 module randomized_lfsr_weak(input wire clk, input wire rst, output wire [WIDTH-1:0] out, output wire metastable);
