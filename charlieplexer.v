@@ -109,3 +109,32 @@ module charlieplexer(
 	assign out_value = out_vcc;
 endmodule
 
+/* Pixel-adressable display that shows the image using a charlieplexer. */
+module charlieplex_display(
+	input  wire pixelclock,
+	input  wire enable,
+	input  wire [PIXELCOUNT-1:0] pixelstate,
+	output wire [PINCOUNT-1:0] out_en,
+	output wire [PINCOUNT-1:0] out_value);
+
+	parameter PIXELCOUNT = 12;
+	localparam PINCOUNT = $rtoi($ceil( (1.0 + $sqrt(1.0 + 4.0 * PIXELCOUNT)) / 2 ));
+	localparam INDEXBITS = $clog2(PIXELCOUNT+1);
+
+	reg [INDEXBITS-1:0] current_pixel = 0;
+	always @(posedge pixelclock) begin
+		if(current_pixel >= PIXELCOUNT-1)
+			current_pixel <= 0;
+		else
+			current_pixel <= current_pixel + 1;
+	end
+
+	wire current_pixel_on = enable & pixelstate[current_pixel];
+
+	charlieplexer #(.PINCOUNT(PINCOUNT)) plexer(
+		.in(current_pixel),
+		.enable(current_pixel_on),
+		.out_en(out_en),
+		.out_value(out_value));
+endmodule
+
