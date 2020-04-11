@@ -6,7 +6,7 @@ TESTS=$(TESTBENCHES:%.v=%.test)
 
 
 %_tb.test: %_tb.v %.v
-	@iverilog -o $@ $^
+	@iverilog -Wall -Wno-timescale -o $@ $^
 
 run_tests: $(TESTS)
 	@for test in $^; do \
