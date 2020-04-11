@@ -114,8 +114,8 @@ module simple_spi_slave_tb();
 	endtask
 
 	initial begin
-		$dumpfile("simple_spi_slave_tb.vcd");
-		$dumpvars;
+		//$dumpfile("simple_spi_slave_tb.vcd");
+		//$dumpvars;
 		errors = 0;
 		system_clock = 0;
 		pin_clk = 0;
