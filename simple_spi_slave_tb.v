@@ -139,7 +139,6 @@ module simple_spi_slave_tb();
 			$error("FAIL: collected %d errors", errors);
 			$fatal();
 		end else begin
-			$display("PASS: testsuite finished successfully");
 			$finish;
 		end
 	end
