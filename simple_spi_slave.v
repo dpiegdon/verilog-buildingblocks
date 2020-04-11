@@ -43,8 +43,8 @@ module simple_spi_slave(
 
 	input wire [WIDTH-1:0] value_miso,
 	output reg [WIDTH-1:0] value_mosi,
-	output wire cs_stop,
 	output wire cs_start,
+	output wire cs_stop,
 	output wire value_valid);
 
 	parameter WIDTH = 32;
