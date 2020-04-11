@@ -70,7 +70,7 @@ module simple_spi_slave(
 	assign value_valid = (cs_stop && (bit_counter == WIDTH));
 
 
-	always @(posedge system_clk) begin
+	always @(negedge system_clk) begin
 		pin_ncs_stabilizer  <= { pin_ncs,  pin_ncs_stabilizer[3:1]  };
 		pin_clk_stabilizer  <= { pin_clk,  pin_clk_stabilizer[3:1]  };
 		pin_mosi_stabilizer <= { pin_mosi, pin_mosi_stabilizer[3:1] };
