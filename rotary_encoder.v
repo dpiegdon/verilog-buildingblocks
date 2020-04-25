@@ -18,33 +18,32 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 `default_nettype none
 
-// Fully debounced digital rotary encoder (e.g. EC11)
-module debounced_encoder(input wire clk, input wire in_a, input wire in_b, output wire out_ccw, output wire out_cw);
+/* Debounced digital rotary encoder. (e.g. EC11)
+ *
+ * Expects inputs A and B of digital rotary encoder (with external pullups)
+ * and yields a clk-long flag on out_ccw (counter-clockwise)
+ * or out_cw (clockwise) to indicate a single rotation step.
+ */
+module rotary_encoder(input wire clk, input wire in_a, input wire in_b, output wire out_ccw, output wire out_cw);
 	parameter DEBOUNCE_CYCLES = 100;
-
-	wire pin_value_a;
-	wire pin_value_b;
-
-	pullup_input input_pin_a(.pin(in_a), .value(pin_value_a));
-	pullup_input input_pin_b(.pin(in_b), .value(pin_value_b));
 
 	wire debounced_a;
 	wire debounced_b;
 
 	debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
-		input_a_debouncer(.clk(clk), .in(pin_value_a), .out(debounced_a));
-
+		input_a_debouncer(.clk(clk), .in(in_a), .out(debounced_a));
 	debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
-		input_b_debouncer(.clk(clk), .in(pin_value_b), .out(debounced_b));
+		input_b_debouncer(.clk(clk), .in(in_b), .out(debounced_b));
 
 	wire marker = !(debounced_a || debounced_b);
-	reg previously_marker = 0;
+	reg previous_marker = 0;
 
-	always @(negedge clk) begin
-		previously_marker <= marker;
+	always @(posedge clk) begin
+		previous_marker <= marker;
 	end
 
-	assign out_ccw = previously_marker && !marker && debounced_a;
-	assign out_cw = previously_marker && !marker && debounced_b;
+	assign out_ccw = previous_marker && debounced_a;
+	assign out_cw = previous_marker && debounced_b;
 endmodule
+
 
