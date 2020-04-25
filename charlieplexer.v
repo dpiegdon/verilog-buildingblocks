@@ -109,7 +109,15 @@ module charlieplexer(
 	assign out_value = out_vcc;
 endmodule
 
-/* Pixel-adressable display that shows the image using a charlieplexer. */
+/* Fully addressable display of PIXELCOUNT pixels
+ * that shows the image using a charlieplexer.
+ *
+ * pixelclock: clock at which individual pixels are multiplexed
+ * enable:     global enable flag for display
+ * pixelstate: display state to show
+ * out_en:     flags indicating that an output shall be driven instead of tristated
+ * out_value:  values for non-tristated outputs (0=GND, 1=VCC)
+ */
 module charlieplex_display(
 	input  wire pixelclock,
 	input  wire enable,

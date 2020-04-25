@@ -10,6 +10,7 @@ Contains
 
 * `charlieplexer.v`
   Generic charlieplexing module for N pins to control N*(N-1) LEDs.
+  Also contains a generic addressable display that uses a charlieplexer.
 
 * `debouncer.v`
   Button debouncer.
@@ -22,6 +23,9 @@ Contains
 
 * `random.v`
   Modules to generate metastable output and random numbers.
+
+* `simple_spi_slave.v`
+  Simple SPI slave implementation.
 
 * `synchronous_reset_timer.v`
   Module to synchronize an sync reset signal to a clock domain and hold it for a defined number of clock cycles.
