@@ -57,7 +57,7 @@ module randomized_lfsr(input wire clk, input wire rst, output wire bit_ready, ou
 	reg [$clog2(WIDTH)-1:0] bits_remaining = WIDTH-1;
 	reg previous_bit_ready = 0;
 
-	always @ (posedge clk) begin
+	always @ (negedge clk) begin
 		if(rst || word_ready) begin
 			bits_remaining <= WIDTH-1;
 		end else begin

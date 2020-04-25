@@ -46,7 +46,7 @@ module debouncer(
 	reg running = 0;
 	reg [$clog2(DEBOUNCE_CYCLES+1)-1 : 0] bounce_timeout = 0;
 
-	always @(posedge clk) begin
+	always @(negedge clk) begin
 		if(old != in) begin
 			running <= 1;
 			bounce_timeout <= DEBOUNCE_CYCLES;

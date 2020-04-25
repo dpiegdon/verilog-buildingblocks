@@ -55,7 +55,7 @@ module simple_spi_slave_tb();
 		.cs_start(dut_cs_start),
 		.value_valid(dut_value_valid));
 	
-	always @(posedge system_clock) begin
+	always @(negedge system_clock) begin
 		if(dut_value_valid) begin
 			slave_mosi_buffer <= dut_mosi_in;
 		end

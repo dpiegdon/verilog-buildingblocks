@@ -101,7 +101,7 @@ module uart(
 	assign tx = tx_out;
 	assign is_transmitting = (tx_state != TX_IDLE);
 
-	always @(posedge clk) begin
+	always @(negedge clk) begin
 		if (rst) begin
 			rx_clk_divider = CLOCK_DIVIDE;
 			tx_clk_divider = CLOCK_DIVIDE;

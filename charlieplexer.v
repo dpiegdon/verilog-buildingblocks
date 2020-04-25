@@ -130,7 +130,7 @@ module charlieplex_display(
 	localparam INDEXBITS = $clog2(PIXELCOUNT+1);
 
 	reg [INDEXBITS-1:0] current_pixel = 0;
-	always @(posedge pixelclock) begin
+	always @(negedge pixelclock) begin
 		if(current_pixel >= PIXELCOUNT-1)
 			current_pixel <= 0;
 		else

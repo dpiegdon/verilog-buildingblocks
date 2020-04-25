@@ -33,7 +33,7 @@ module binary_debias(input wire clk, input wire metastable, output reg bit_ready
 
 	reg last_random;
 
-	always @ (posedge clk) begin
+	always @ (negedge clk) begin
 		bit_ready <= bit_ready+1;
 		if(bit_ready) begin
 			random <= !metastable ^ last_random;

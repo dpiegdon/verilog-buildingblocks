@@ -47,16 +47,16 @@ module lfsr_tb();
 		errors = 0;
 
 		// generate whitelist against which we compare.
-		whitelist[1] = 16'hACE1;
-		for(i=2; i<ITERATIONS; i=i+1) begin
+		whitelist[0] = 16'hACE1;
+		for(i=1; i<ITERATIONS; i=i+1) begin
 			old = whitelist[i-1];
 			feedback = old[0] ^ old[2] ^ old[3] ^ old[5];
 			whitelist[i] = { feedback, old[15:1] };
 		end
 
-		if(whitelist[1000] != 16'hf973) begin
+		if(whitelist[1000] != 16'h7cb9) begin
 			$error("TEST is broken:");
-			$error(" known-good value for iteration 1000 is 0xf973,");
+			$error(" known-good value for iteration 1000 is 0x7cb9,");
 			$error(" but test-calc did yield: 0x%04x", whitelist[1000]);
 			errors = errors+1;
 		end
@@ -66,9 +66,9 @@ module lfsr_tb();
 		clock_counter = 0;
 		random = 0;
 		rst = 1;
-		@(negedge clk);
+		@(posedge clk);
 		rst = 0;
-		@(negedge clk);
+		@(posedge clk);
 
 		// check first thousand or so values
 		while(iteration < ITERATIONS) begin
@@ -79,7 +79,7 @@ module lfsr_tb();
 					iteration, shiftreg, whitelist[iteration]);
 				errors = errors+1;
 			end
-			@(negedge clk);
+			@(posedge clk);
 		end
 
 		// make sure there were iterations
@@ -90,12 +90,12 @@ module lfsr_tb();
 		while(shiftreg == 16'b1010_1100_1110_0001) begin
 			$error("stall rquired: 0x%04x", shiftreg);
 			errors = errors+1;
-			@(negedge clk);
+			@(posedge clk);
 		end;
 
 		// test reset behaviour
 		rst = 1;
-		@(negedge clk);
+		@(posedge clk);
 		rst = 0;
 
 		if(shiftreg != 16'b1010_1100_1110_0001) begin

@@ -38,7 +38,7 @@ module rotary_encoder(input wire clk, input wire in_a, input wire in_b, output w
 	wire marker = !(debounced_a || debounced_b);
 	reg previous_marker = 0;
 
-	always @(posedge clk) begin
+	always @(negedge clk) begin
 		previous_marker <= marker;
 	end
 

@@ -34,8 +34,8 @@ module clock_prescaler_tb();
 	integer errors = 0;
 
 	initial begin
-		$dumpfile("clock_prescaler_tb.vcd");
-		$dumpvars;
+		//$dumpfile("clock_prescaler_tb.vcd");
+		//$dumpvars;
 
 		for(i = 0; i < 8970; i=i+1) begin
 			#1;
