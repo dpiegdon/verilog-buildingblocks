@@ -30,7 +30,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
  * @pin_ncs is active low.
  * Bit-order is MSB first.
  * Data is sampled on rising clock edge and latched out on falling edge,
- * i.e. CPOL=0, CPHA=0.
+ * i.e. CPOL=1'b0, CPHA=0 (SPI MODE=0)
+ * Optionally, CLK is inverted if CPOL=1'b1 (SPI MODE=1)
  */
 module simple_spi_slave(
 	input wire system_clk,
@@ -48,6 +49,7 @@ module simple_spi_slave(
 	output wire value_valid);
 
 	parameter WIDTH = 32;
+	parameter CPOL = 1'b0;
 
 
 	reg [$clog2(WIDTH+1)-1:0] bit_counter = 0;
@@ -72,7 +74,7 @@ module simple_spi_slave(
 
 	always @(negedge system_clk) begin
 		pin_ncs_stabilizer  <= { pin_ncs,  pin_ncs_stabilizer[3:1]  };
-		pin_clk_stabilizer  <= { pin_clk,  pin_clk_stabilizer[3:1]  };
+		pin_clk_stabilizer  <= { CPOL^pin_clk,  pin_clk_stabilizer[3:1]  };
 		pin_mosi_stabilizer <= { pin_mosi, pin_mosi_stabilizer[3:1] };
 
 		if(cs_active) begin
