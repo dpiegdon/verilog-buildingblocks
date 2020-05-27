@@ -76,7 +76,7 @@ module charlieplexer(
 	parameter PINCOUNT = 4;
 	localparam INDEXBITS = $clog2(PINCOUNT * (PINCOUNT-1));
 
-	function [INDEXBITS-1:0] LedIndex(input integer x, input integer y, input integer pinCount);
+	function [INDEXBITS-1:0] LedIndex(input [INDEXBITS-1:0] x, input [INDEXBITS-1:0] y, input [INDEXBITS-1:0] pinCount);
 		// Returns the index of the LED at grid-position x/y.
 		if(x > y) begin
 			LedIndex = (pinCount-1)*x + y;
@@ -95,7 +95,7 @@ module charlieplexer(
 		for(y = 0; y < PINCOUNT; y=y+1) begin
 			for(x = 0; x < PINCOUNT; x=x+1) begin
 				if(x != y) begin
-					assign grid[x][y] = (in == LedIndex(x, y, PINCOUNT));
+					assign grid[x][y] = (in == LedIndex(x, y, PINCOUNT[INDEXBITS-1:0]));
 					assign out_vcc[x] = grid[x][y];
 					assign out_gnd[y] = grid[x][y];
 				end
@@ -118,6 +118,7 @@ endmodule
  * out_en:     flags indicating that an output shall be driven instead of tristated
  * out_value:  values for non-tristated outputs (0=GND, 1=VCC)
  */
+/* verilator lint_off DECLFILENAME */
 module charlieplex_display(
 	input  wire pixelclock,
 	input  wire enable,

@@ -6,6 +6,7 @@ TESTS=$(TESTBENCHES:%.v=%.test)
 
 
 %_tb.test: %_tb.v %.v
+	@verilator +1364-2005ext+v --lint-only -Wall --bbox-unsup $(patsubst %_tb.test,%.v,$@)
 	@iverilog -Wall -Wno-timescale -o $@ $^
 
 run_tests: $(TESTS)
