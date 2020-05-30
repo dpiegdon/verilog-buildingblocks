@@ -26,7 +26,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
  * or out_cw (clockwise) to indicate a single rotation step.
  */
 module rotary_encoder_pullup(input wire clk, input wire in_a, input wire in_b, output wire out_ccw, output wire out_cw);
-	parameter DEBOUNCE_CYCLES = 100;
+	parameter DEBOUNCE_CYCLES = 0;
 
 	wire pin_value_a;
 	wire pin_value_b;

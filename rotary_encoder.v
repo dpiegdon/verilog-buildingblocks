@@ -25,15 +25,22 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
  * or out_cw (clockwise) to indicate a single rotation step.
  */
 module rotary_encoder(input wire clk, input wire in_a, input wire in_b, output wire out_ccw, output wire out_cw);
-	parameter DEBOUNCE_CYCLES = 100;
+	parameter DEBOUNCE_CYCLES = 0;
 
 	wire debounced_a;
 	wire debounced_b;
 
-	debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
-		input_a_debouncer(.clk(clk), .in(in_a), .out(debounced_a));
-	debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
-		input_b_debouncer(.clk(clk), .in(in_b), .out(debounced_b));
+	generate
+		if(DEBOUNCE_CYCLES == 0) begin
+			assign debounced_a = in_a;
+			assign debounced_b = in_b;
+		end else begin
+			debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
+				input_a_debouncer(.clk(clk), .in(in_a), .out(debounced_a));
+			debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
+				input_b_debouncer(.clk(clk), .in(in_b), .out(debounced_b));
+		end
+	endgenerate
 
 	wire marker = !(debounced_a || debounced_b);
 	reg previous_marker = 0;
