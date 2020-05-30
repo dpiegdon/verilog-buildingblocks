@@ -35,7 +35,7 @@ module rotary_encoder_pullup(input wire clk, input wire in_a, input wire in_b, o
 	pullup_input input_pin_b(.pin(in_b), .value(pin_value_b));
 
 	rotary_encoder #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
-		encoder(pin_value_a, pin_value_b, out_ccw, out_cw);
+		encoder(clk, pin_value_a, pin_value_b, out_ccw, out_cw);
 
 endmodule
 

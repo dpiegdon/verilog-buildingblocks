@@ -46,4 +46,3 @@ module rotary_encoder(input wire clk, input wire in_a, input wire in_b, output w
 	assign out_cw = previous_marker && debounced_b;
 endmodule
 
-
