@@ -131,14 +131,18 @@ module charlieplex_display(
 	localparam INDEXBITS = $clog2(PIXELCOUNT+1);
 
 	reg [INDEXBITS-1:0] current_pixel = 0;
+	reg [PIXELCOUNT-1:0] nextstate = 0;
 	always @(posedge pixelclock) begin
-		if(current_pixel >= PIXELCOUNT-1)
+		if(current_pixel >= PIXELCOUNT-1) begin
 			current_pixel <= 0;
-		else
+			nextstate <= pixelstate;
+		end else begin
 			current_pixel <= current_pixel + 1;
+			nextstate <= {1'b0, nextstate[PIXELCOUNT-1:1]};
+		end
 	end
 
-	wire current_pixel_on = enable & pixelstate[current_pixel];
+	wire current_pixel_on = enable & nextstate[0];
 
 	charlieplexer #(.PINCOUNT(PINCOUNT)) plexer(
 		.in(current_pixel),
