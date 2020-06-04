@@ -39,11 +39,11 @@ module simple_spi_slave(
 	input wire pin_ncs,
 	input wire pin_clk,
 	input wire pin_mosi,
-	output wire pin_miso,
+	output reg pin_miso,
 	output wire pin_miso_en,
 
 	input wire [WIDTH-1:0] value_miso,
-	output reg [WIDTH-1:0] value_mosi,
+	output wire [WIDTH-1:0] value_mosi,
 	output wire cs_start,
 	output wire cs_stop,
 	output wire value_valid);
@@ -52,8 +52,16 @@ module simple_spi_slave(
 	parameter CPOL = 1'b0;
 
 
+	/*
+	 * datum holds both the MISO and MOSI words.
+	 * the MSB is the bit that will be transmitted next via MISO,
+	 * the LSB is the bit that was most recently received via MOSI.
+	 */
+	reg [WIDTH-1:0] datum = 0;
+	// value_mosi is only valid if value_valid.
+	assign value_mosi = datum;
+
 	reg [$clog2(WIDTH+1)-1:0] bit_counter = 0;
-	reg [WIDTH-1:0] value_miso_buffered = 0;
 
 	reg [3:0] pin_ncs_stabilizer = 4'b1111;
 	reg [3:0] pin_clk_stabilizer = 4'b0000;
@@ -63,10 +71,9 @@ module simple_spi_slave(
 	assign cs_start = (pin_ncs_stabilizer[1:0] == 2'b01);
 	assign cs_stop  = (pin_ncs_stabilizer[1:0] == 2'b10);
 
-	wire sample = (pin_clk_stabilizer[1:0] == 2'b10);
+	wire sample_in = (pin_clk_stabilizer[1:0] == 2'b10);
 	wire latch_out = (pin_clk_stabilizer[1:0] == 2'b01);
 
-	assign pin_miso = value_miso_buffered[WIDTH-1];
 	assign pin_miso_en = cs_active && !pin_ncs;
 
 	assign value_valid = (cs_stop && (bit_counter == WIDTH));
@@ -79,15 +86,16 @@ module simple_spi_slave(
 
 		if(cs_active) begin
 			if(cs_start) begin
-				value_miso_buffered <= value_miso;
+				datum <= value_miso;
+				pin_miso <= value_miso[WIDTH-1];
 				bit_counter <= 0;
 			end else if(!cs_stop) begin
 				if(bit_counter < WIDTH) begin
-					if(sample) begin
-							value_mosi <= { value_mosi[WIDTH-2:0], pin_mosi_stabilizer[0] };
-							bit_counter <= bit_counter+1;
+					if(sample_in) begin
+						datum <= {datum[WIDTH-2:0], pin_mosi_stabilizer[0]};
+						bit_counter <= bit_counter+1;
 					end else if(latch_out) begin
-							value_miso_buffered <= { value_miso_buffered[WIDTH-2:0], 1'b0};
+						pin_miso <= datum[WIDTH-1];
 					end
 				end
 			end

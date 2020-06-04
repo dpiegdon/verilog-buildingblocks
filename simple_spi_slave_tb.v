@@ -64,6 +64,7 @@ module simple_spi_slave_tb();
 	integer errors;
 
 	task automatic clock_single;
+		// clock a single bit into/from the SPI slave
 		input bit;
 		begin
 			pin_mosi = bit;
@@ -76,6 +77,8 @@ module simple_spi_slave_tb();
 	endtask
 
 	task automatic clock_word;
+		// clock a whole work into/from the SPI slave,
+		// including assert/deassert of chip select.
 		input [WIDTH-1:0] word;
 		integer i;
 		begin
@@ -134,6 +137,7 @@ module simple_spi_slave_tb();
 		check_full_transfert(4'b1101, 4'b1011);
 		check_full_transfert(4'b1011, 4'b1101);
 		check_full_transfert(4'b0111, 4'b1110);
+		check_full_transfert(4'b1110, 4'b1110);
 
 		if(errors) begin
 			$error("FAIL: collected %d errors", errors);
