@@ -19,7 +19,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 
 // Implementation of tristateable output.
-module tristate_output(input pin, input wire enable, input wire value);
+module tristate_output(output pin, input wire enable, input wire value);
 	SB_IO #(
 		.PIN_TYPE(6'b1010_01),
 		.PULLUP(1'b0),
