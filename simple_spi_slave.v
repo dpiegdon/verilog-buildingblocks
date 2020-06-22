@@ -61,29 +61,24 @@ module simple_spi_slave(
 	// value_mosi is only valid if value_valid.
 	assign value_mosi = datum;
 
+	wire cs_active;
+	synchronizer #(.START_HISTORY(4'b1111)) cs_syncer(system_clk, !pin_ncs, cs_active, cs_start, cs_stop);
+
+	wire sck_sample;
+	wire sck_latch;
+	/* verilator lint_off PINCONNECTEMPTY */
+	synchronizer sck_syncer(.clk(system_clk), .in(pin_clk ^ CPOL), .out(), .rising_edge(sck_sample), .falling_edge(sck_latch));
+
+	wire mosi_sync;
+	synchronizer mosi_syncer(.clk(system_clk), .in(pin_mosi), .out(mosi_sync), .rising_edge(), .falling_edge());
+
+	assign pin_miso_en = cs_active;
+
 	reg [$clog2(WIDTH+1)-1:0] bit_counter = 0;
-
-	reg [2:0] pin_ncs_stabilizer = 3'b111;
-	reg [2:0] pin_clk_stabilizer = 3'b000;
-	reg [2:0] pin_mosi_stabilizer = 0;
-
-	wire cs_active = (pin_ncs_stabilizer[1] == 1'b0);
-	assign cs_start = (pin_ncs_stabilizer[1:0] == 2'b01);
-	assign cs_stop  = (pin_ncs_stabilizer[1:0] == 2'b10);
-
-	wire sample_in = (pin_clk_stabilizer[1:0] == 2'b10);
-	wire latch_out = (pin_clk_stabilizer[1:0] == 2'b01);
-
-	assign pin_miso_en = !pin_ncs;
 
 	assign value_valid = (cs_stop && (bit_counter == WIDTH));
 
-
 	always @(posedge system_clk) begin
-		pin_ncs_stabilizer  <= { pin_ncs,  pin_ncs_stabilizer[2:1]  };
-		pin_clk_stabilizer  <= { CPOL^pin_clk,  pin_clk_stabilizer[2:1]  };
-		pin_mosi_stabilizer <= { pin_mosi, pin_mosi_stabilizer[2:1] };
-
 		if(cs_active) begin
 			if(cs_start) begin
 				datum <= value_miso;
@@ -91,10 +86,10 @@ module simple_spi_slave(
 				bit_counter <= 0;
 			end else begin
 				if(bit_counter < WIDTH) begin
-					if(sample_in) begin
-						datum <= {datum[WIDTH-2:0], pin_mosi_stabilizer[0]};
+					if(sck_sample) begin
+						datum <= {datum[WIDTH-2:0], mosi_sync};
 						bit_counter <= bit_counter+1;
-					end else if(latch_out) begin
+					end else if(sck_latch) begin
 						pin_miso <= datum[WIDTH-1];
 					end
 				end

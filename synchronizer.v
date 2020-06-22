@@ -25,8 +25,9 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 module synchronizer(input wire clk, input wire in, output wire out, output wire rising_edge, output wire falling_edge);
 
 	parameter EXTRA_DEPTH = 1;
+	parameter START_HISTORY = 0;
 
-	reg [2 + EXTRA_DEPTH : 0] history;
+	reg [2 + EXTRA_DEPTH : 0] history = START_HISTORY;
 	// NOTE that [max] is input, [1] is present and [0] lies in the past.
 
 	assign out = history[1];
@@ -34,7 +35,7 @@ module synchronizer(input wire clk, input wire in, output wire out, output wire 
 	assign falling_edge = (history[1:0] == 2'b01);
 
 	always @(posedge clk) begin
-		history = { in, history[2+EXTRA_DEPTH : 1] };
+		history <= { in, history[2+EXTRA_DEPTH : 1] };
 	end
 endmodule
 
