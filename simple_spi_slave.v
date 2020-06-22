@@ -44,6 +44,7 @@ module simple_spi_slave(
 
 	input wire [WIDTH-1:0] value_miso,
 	output wire [WIDTH-1:0] value_mosi,
+	output wire cs_active,
 	output wire cs_start,
 	output wire cs_stop,
 	output wire value_valid);
@@ -61,7 +62,6 @@ module simple_spi_slave(
 	// value_mosi is only valid if value_valid.
 	assign value_mosi = datum;
 
-	wire cs_active;
 	synchronizer #(.START_HISTORY(4'b1111)) cs_syncer(system_clk, !pin_ncs, cs_active, cs_start, cs_stop);
 
 	wire sck_sample;
@@ -76,7 +76,7 @@ module simple_spi_slave(
 
 	reg [$clog2(WIDTH+1)-1:0] bit_counter = 0;
 
-	assign value_valid = (cs_stop && (bit_counter == WIDTH));
+	assign value_valid = (!cs_active && (bit_counter == WIDTH));
 
 	always @(posedge system_clk) begin
 		if(cs_active) begin
