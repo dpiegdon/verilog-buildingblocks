@@ -88,25 +88,22 @@ module charlieplexer(
 	// @grid corresponds to the matrix of LEDs and resistors as seen above
 	wire grid [PINCOUNT-1:0] [PINCOUNT-1:0];
 	wor [PINCOUNT-1:0] out_gnd; // OR over each row
-	wor [PINCOUNT-1:0] out_vcc; // OR over each column
 
 	generate
 		genvar x, y;
 		for(y = 0; y < PINCOUNT; y=y+1) begin
 			for(x = 0; x < PINCOUNT; x=x+1) begin
-				if(x != y) begin
+				if(x != y) begin : gen_charlie_cell
 					assign grid[x][y] = (in == LedIndex(x, y, PINCOUNT[INDEXBITS-1:0]));
-					assign out_vcc[x] = grid[x][y];
+					assign out_value[x] = grid[x][y];
 					assign out_gnd[y] = grid[x][y];
 				end
 			end
 
 			// gate output with enable-signal
-			assign out_en[y] = enable && (out_gnd[y] || out_vcc[y]);
+			assign out_en[y] = enable && (out_gnd[y] || out_value[y]);
 		end
 	endgenerate
-
-	assign out_value = out_vcc;
 endmodule
 
 /* Fully addressable display of PIXELCOUNT pixels
