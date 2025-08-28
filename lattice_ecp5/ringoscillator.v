@@ -38,10 +38,9 @@ module ringoscillator(output wire chain_out);
 		genvar i;
 		for(i=0; i<=DELAY_LUTS; i=i+1) begin: delayline
 			(* keep *) (* noglobal *)
-			TRELLIS_SLICE #(.LUT0_INITVAL((i==0)?16'd1:16'd2))
-				chain_lut(.F0(chain_wire[i+1]), .A0(chain_wire[i]), .B0(0), .C0(0), .D0(0));
+			LUT4 #(.INIT((i==0)?16'd1:16'd2))
+				chain_lut(.Z(chain_wire[i+1]), .A(chain_wire[i]), .B(1'b0), .C(1'b0), .D(1'b0));
 		end
 	endgenerate
-	
 endmodule
 
