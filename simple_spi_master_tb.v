@@ -41,6 +41,7 @@ module simple_spi_master_tb();
 	reg  msb_first = 0;
 
 	reg  xfer_enable = 0;
+	wire xfer_idle;
 	reg  xfer_word_trigger = 0;
 	wire xfer_word_completed;
 	reg  [WORDWIDTH-1:0] data_tx;
@@ -60,6 +61,7 @@ module simple_spi_master_tb();
 			.cpha(cpha),
 			.msb_first(msb_first),
 			.xfer_enable(xfer_enable),
+			.xfer_idle(xfer_idle),
 			.xfer_word_trigger(xfer_word_trigger),
 			.xfer_word_completed(xfer_word_completed),
 			.data_tx(data_tx),
@@ -84,6 +86,15 @@ module simple_spi_master_tb();
 		begin
 			// assumes master already enabled, in ready mode,
 			// waiting for trigger.
+			if (!spi_cs) begin
+				$error("CS not set during xfer");
+				errors += 1;
+			end
+
+			if (!xfer_idle) begin
+				$error("xfer_idle not set before xfer");
+				errors += 1;
+			end
 
 			data_tx = test_mosi_value;
 			#2;
@@ -91,8 +102,8 @@ module simple_spi_master_tb();
 			#2
 			xfer_word_trigger = 0;
 
-			if (!spi_cs) begin
-				$error("CS not set during xfer");
+			if (xfer_idle) begin
+				$error("xfer_idle set during xfer");
 				errors += 1;
 			end
 
@@ -142,6 +153,10 @@ module simple_spi_master_tb();
 			end
 			if (data_rx != slave_buf_tx) begin
 				$error("MISO sent %d but received %d", slave_buf_tx, data_rx);
+				errors += 1;
+			end
+			if (!xfer_idle) begin
+				$error("xfer_idle not set after xfer");
 				errors += 1;
 			end
 

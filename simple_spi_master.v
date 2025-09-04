@@ -29,6 +29,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
  *  - Adjust cpol, cpha, msb_first, clk_div.
  *  - Set xfer_enable.
  *  - While there are words to be transceived:
+ *     * Await xfer_idle
  *     * Set data_tx to the word to be transmitted next
  *     * Set xfer_word_trigger for one cycle
  *       (i.e. rising edge, clear after 1 cycle)
@@ -57,6 +58,7 @@ module simple_spi_master(
 	input  wire msb_first,				// send/receive MSB first
 
 	input  wire xfer_enable,			// xfer-on flag (more or less chipselect)
+	output wire xfer_idle,				// no xfer running, idle state
 	input  wire xfer_word_trigger,			// rising edge triggers xfer of next word
 	output reg  xfer_word_completed,		// rising edge indicates that word xfer is ready and received in data_rx
 
@@ -104,6 +106,7 @@ module simple_spi_master(
 	reg [PRESCALER_WIDTH-1+1:0] clk_prescaler = 0;						// prescaler counter
 	wire [PRESCALER_WIDTH-1+1:0] clk_last = {1'b0, clk_div} + 1;				// stop-condition for prescaler counter
 	wire [WORDWIDTH-1:0] next_mask = msb_first ? (current_mask >> 1) : (current_mask << 1);	// mask for the next bit to be xfer'ed, or 0 when finished
+	assign xfer_idle = xfer_enable && (state == STATE_XFER_AWAIT);
 
 	always @(posedge system_clk) begin
 		if (xfer_enable) begin
