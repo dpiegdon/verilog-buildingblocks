@@ -17,6 +17,8 @@ clean:
 
 simple_spi_slave_tb.test: simple_spi_slave_tb.v simple_spi_slave.v synchronizer.v
 
+simple_spi_master_tb.test: simple_spi_master_tb.v simple_spi_master.v synchronizer.v
+
 %_tb.test: %.v
 	verilator +1364-2005ext+v --lint-only -Wall --bbox-unsup $<
 	iverilog -Wall -Wno-timescale -o $@ $^
