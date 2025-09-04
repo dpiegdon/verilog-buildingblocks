@@ -19,13 +19,10 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
-// testbench for simple_spi_master
+module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0] errors);
+	parameter WORDWIDTH = 4;
+	parameter SYNCTIME = 3;
 
-module simple_spi_master_tb();
-
-	parameter WORDWIDTH=4;
-
-	integer errors;
 	integer phase;
 	integer polarity;
 	integer msb;
@@ -52,8 +49,7 @@ module simple_spi_master_tb();
 	reg  spi_miso = 0;
 	wire spi_mosi;
 
-
-	simple_spi_master #(.WORDWIDTH(WORDWIDTH), .PRESCALER_WIDTH(4), .SYNCHRONIZE_MISO_FOR_CLKS(3))
+	simple_spi_master #(.WORDWIDTH(WORDWIDTH), .PRESCALER_WIDTH(4), .SYNCHRONIZE_MISO_FOR_CLKS(SYNCTIME))
 		master(
 			.system_clk(system_clk[0]),
 			.clk_div(clk_div[3:0]),
@@ -271,9 +267,7 @@ module simple_spi_master_tb();
 
 
 	initial begin
-		$dumpfile("simple_spi_master_tb.vcd");
-		$dumpvars;
-
+		finished = 0;
 		errors = 0;
 
 		/* single-word xfers for all combinations of CPOL/CPHA/bitorder */
@@ -305,12 +299,45 @@ module simple_spi_master_tb();
 
 		/* multi-word xfer */
 
-		if (errors) begin
+		finished = 1;
+	end
+
+endmodule
+
+// testbench for simple_spi_master
+
+module simple_spi_master_tb();
+	integer errors = 0;
+
+	localparam SUBTESTS = 2;
+	wire [SUBTESTS-1:0] subtest_finished;
+	wire [15:0] subtest_errors[SUBTESTS-1:0];
+
+	simple_spi_master_with_synctime_tb #(.SYNCTIME(0)) spi_master_sync0(subtest_finished[0], subtest_errors[0]);
+	simple_spi_master_with_synctime_tb #(.SYNCTIME(3)) spi_master_sync3(subtest_finished[1], subtest_errors[1]);
+
+	wire finished = &(subtest_finished);
+	integer i;
+
+	initial begin
+		/*
+		$dumpfile("simple_spi_master_tb.vcd");
+		$dumpvars;
+		*/
+
+		#1;
+
+		wait(finished);
+
+		for (i = 0; i < SUBTESTS; ++i) begin
+			errors = errors + int'(subtest_errors[i]);
+		end
+
+		if(errors != 0) begin
 			$error("FAIL: collected %d errors", errors);
 			$fatal();
 		end else begin
 			$finish();
 		end
 	end
-
 endmodule

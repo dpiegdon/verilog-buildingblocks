@@ -65,9 +65,9 @@ module simple_spi_slave_tb();
 
 	task automatic clock_single;
 		// clock a single bit into/from the SPI slave
-		input bit;
+		input xbit;
 		begin
-			pin_mosi = bit;
+			pin_mosi = xbit;
 			#100;
 			pin_clk = 1;
 			master_miso_buffer = { master_miso_buffer[WIDTH-2:0], pin_miso };

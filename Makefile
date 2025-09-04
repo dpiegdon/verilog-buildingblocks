@@ -20,6 +20,5 @@ simple_spi_slave_tb.test: simple_spi_slave_tb.v simple_spi_slave.v synchronizer.
 simple_spi_master_tb.test: simple_spi_master_tb.v simple_spi_master.v synchronizer.v
 
 %_tb.test: %.v
-	verilator +1364-2005ext+v --lint-only -Wall --bbox-unsup $<
-	iverilog -Wall -Wno-timescale -o $@ $^
-
+	verilator +1800-2012ext+v --lint-only -Wall --bbox-unsup $<
+	iverilog  -g2012 -Wall -Wno-timescale -o $@ $^

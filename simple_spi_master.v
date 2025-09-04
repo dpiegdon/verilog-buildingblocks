@@ -97,7 +97,7 @@ module simple_spi_master(
 					    .falling_edge());
 		end else begin : miso_sync_error
 			/* raise an error for invalid values of SYNCHRONIZE_MISO_FOR_CLKS */
-			INVALID_PARAMETER_VALUE not_a_real_instance();
+			INVALID_VALUE_FOR_PARAMETER_SYNCHRONIZE_MISO_FOR_CLKS not_a_real_instance();
 		end
 	endgenerate
 
