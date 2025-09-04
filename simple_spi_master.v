@@ -80,8 +80,8 @@ module simple_spi_master(
 	localparam STATE_XFER_SAMPLE = 2;		// xfer triggered and running: sample-half of current clock
 	localparam STATE_XFER_READY = 3;		// xfer of word completed, await trigger-removal
 
+	// synchronize MISO, if need be
 	wire spi_miso_synced;
-
 	generate
 		if (SYNCHRONIZE_MISO_FOR_CLKS == 0) begin : miso_sync_off
 			assign spi_miso_synced = spi_miso;
@@ -94,14 +94,16 @@ module simple_spi_master(
 					    .rising_edge(),
 					    .falling_edge());
 		end else begin : miso_sync_error
+			/* raise an error for invalid values of SYNCHRONIZE_MISO_FOR_CLKS */
 			INVALID_PARAMETER_VALUE not_a_real_instance();
 		end
 	endgenerate
 
 	reg [1:0] state = STATE_XFER_AWAIT;
-	reg [WORDWIDTH-1:0] current_mask = 0;		// mask with only current bit set
-	reg [PRESCALER_WIDTH-1:0] clk_prescaler = 0;	// prescaler counter
-	wire [WORDWIDTH-1:0] next_mask = msb_first ? (current_mask >> 1) : (current_mask << 1);
+	reg [WORDWIDTH-1:0] current_mask = 0;							// mask with only current bit set
+	reg [PRESCALER_WIDTH-1+1:0] clk_prescaler = 0;						// prescaler counter
+	wire [PRESCALER_WIDTH-1+1:0] clk_last = {1'b0, clk_div} + 1;				// stop-condition for prescaler counter
+	wire [WORDWIDTH-1:0] next_mask = msb_first ? (current_mask >> 1) : (current_mask << 1);	// mask for the next bit to be xfer'ed, or 0 when finished
 
 	always @(posedge system_clk) begin
 		if (xfer_enable) begin
@@ -119,7 +121,7 @@ module simple_spi_master(
 					end
 				end
 				STATE_XFER_LATCH, STATE_XFER_SAMPLE: begin
-					if (clk_prescaler <= clk_div) begin
+					if (clk_prescaler != clk_last) begin
 						if (clk_prescaler == 0) begin
 							if (state == STATE_XFER_LATCH) begin
 								// latch output data

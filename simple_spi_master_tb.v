@@ -283,6 +283,7 @@ module simple_spi_master_tb();
 					check_full_xfer_long(4, polarity, phase, msb, 4'b1010, 4'b0101, 4'b1100,  4'b0000, 4'b1111, 4'b0000);
 					check_full_xfer_long(4, polarity, phase, msb, 4'b1010, 4'b0000, 4'b0101,  4'b0110, 4'b1111, 4'b1010);
 
+					check_full_xfer_simple(4'b1111, polarity, phase, msb, 4'b1010, 4'b0101);
 				end
 			end
 		end
