@@ -9,8 +9,11 @@ Contains
   Module to XOR two bits in a bistream into one. Used to remove a binary debias in a random stream.
 
 * `charlieplexer.v`
-  Generic charlieplexing module for N pins to control N*(N-1) LEDs.
+  Generic charlieplexing module for N pins to control `N*(N-1)` LEDs.
   Also contains a generic addressable display that uses a charlieplexer.
+
+* `clock_prescaler.v`
+  Simple clock prescaler implementation that also exposes the full prescaler counter.
 
 * `debouncer.v`
   Button debouncer.
@@ -24,8 +27,17 @@ Contains
 * `random.v`
   Modules to generate metastable output and random numbers.
 
+* `rotary_encoder.v`
+  Input decoder for debounced digital rotary encoders like the EC11.
+
+* `simple_spi_master.v`
+  Simple SPI master implementation.
+
 * `simple_spi_slave.v`
   Simple SPI slave implementation.
+
+* `synchronizer.v`
+  Cross-clockdomain signal synchronizer.
 
 * `synchronous_reset_timer.v`
   Module to synchronize an sync reset signal to a clock domain and hold it for a defined number of clock cycles.
@@ -35,20 +47,31 @@ Contains
 
 * Lattice iCE40 specific implementations (in `lattice_ice40/`)
 
- - `lattice_ice40/debounced_button.v`
-  Debounced button from an input pin.
+  - `lattice_ice40/debounced_button.v`
+    Debounced button from an input pin.
 
- - `lattice_ice40/pullup_input.v`
-  Input with pullup.
+  - `lattice_ice40/pullup_input.v`
+    Input with pullup.
 
- - `lattice_ice40/random.v`
-  Modules for random number generation.
-  
- - `lattice_ice40/ringoscillator.v`
-  Ring oscillator implementation.
+  - `lattice_ice40/random.v`
+    Modules for random number generation.
 
- - `lattice_ice40/tristate_output.v`
-  A tristateable output.
+  - `lattice_ice40/ringoscillator.v`
+    Ring oscillator implementation.
+
+  - `lattice_ice40/rotary_encoder_pullup.v`
+    Pull-up implementation for rotary encoder input controller.
+
+  - `lattice_ice40/tristate_output.v`
+    A tristateable output.
+
+* Lattice ECP5 specific implementations (in `lattice_ecp5/`)
+
+  - `lattice_ice40/random.v`
+    Modules for random number generation.
+
+  - `lattice_ice40/ringoscillator.v`
+    Ring oscillator implementation.
 
 
 Contains also testbenches (`*_tb.v`) for some of the modules, see below.
