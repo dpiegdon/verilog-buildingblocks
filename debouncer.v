@@ -20,13 +20,12 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 // input debouncer.
 //
-// if CLOCKED_EDGE_OUT, it yields a rising edge on the output
-// indicating a button press, and nothing when the button is released.
-// the value will be high for only a single clock cycle.
+// on out_edge, a rising edge identifies a button press, and nothing when the button is released.
+// the value will only be high for a single clock.
 //
-// if not CLOCKED_EDGE_OUT, it yields the debounced value of the input.
+// on out_state, the current button state is output, active high when pressed.
 //
-// INPUT_WHEN_IDLE should be set to the value that the line has
+// INPUT_WHEN_IDLE must be set to the value that the line has
 // when no button is pressed. this avoids an initial button press
 // when the FPGA is started, and makes sure the edge comes when the
 // button is pressed, and not when it is released.
@@ -36,9 +35,9 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 module debouncer(
 	input wire clk,
 	input wire in,
-	output reg out = 0);
+	output reg out_state = 0,
+	output reg out_edge = 0);
 
-	parameter CLOCKED_EDGE_OUT = 0;
 	parameter INPUT_WHEN_IDLE = 1;
 	parameter DEBOUNCE_CYCLES = 1000;
 
@@ -50,25 +49,19 @@ module debouncer(
 		if(old != in) begin
 			running <= 1;
 			bounce_timeout <= DEBOUNCE_CYCLES;
+			out_edge <= 0;
 		end else begin
 			if(running) begin
 				bounce_timeout <= bounce_timeout - 1;
 				if(bounce_timeout == 0) begin
 					running <= 0;
-					if(CLOCKED_EDGE_OUT) begin
-						out <= (INPUT_WHEN_IDLE) ? ~in : in;
-					end else begin
-						out <= in;
-					end
+					out_edge <= (INPUT_WHEN_IDLE) ? ~in : in;
+					out_state <= (INPUT_WHEN_IDLE) ? ~in : in;
 				end else begin
-					if(CLOCKED_EDGE_OUT) begin
-						out <= 0;
-					end
+					out_edge <= 0;
 				end
 			end else begin
-				if(CLOCKED_EDGE_OUT) begin
-					out <= 0;
-				end
+				out_edge <= 0;
 			end
 		end
 

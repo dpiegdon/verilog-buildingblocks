@@ -20,16 +20,17 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 // Fully debounced button with an internal pull-up.
 // Connect a switch to the pin that pulls it to GND when pressed.
-module debounced_button(input wire clk, input wire in, output wire out);
+module debounced_button(input wire clk, input wire in, output wire out_state, output wire out_edge);
 	parameter DEBOUNCE_CYCLES = 100;
-	parameter CLOCKED_EDGE_OUT = 0;
 
 	wire pin_value;
 
 	pullup_input input_pin(.pin(in), .value(pin_value));
 
-	debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES),
-		.CLOCKED_EDGE_OUT(CLOCKED_EDGE_OUT))
-		input_debouncer(.clk(clk), .in(pin_value), .out(out));
+	debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
+		input_debouncer(.clk(clk),
+				.in(pin_value),
+				.out_state(out_state),
+				.out_edge(out_edge));
 endmodule
 
