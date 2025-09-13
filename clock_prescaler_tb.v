@@ -42,7 +42,7 @@ module clock_prescaler_tb();
 			reset = 0;
 			if(system_clock != dut_out) begin
 				$error("expected %d != seen %d", system_clock, dut_out);
-				errors += 1;
+				errors = errors+1;
 			end
 			system_clock = system_clock+1;
 		end
@@ -53,11 +53,11 @@ module clock_prescaler_tb();
 
 		if(dut_out != 0) begin
 			$error("reset did not set to zero");
-			errors += 1;
+			errors = errors+1;
 		end
 
 
-		if(errors) begin
+		if (errors != 0) begin
 			$error("FAIL: collected %d errors", errors);
 			$fatal();
 		end else begin

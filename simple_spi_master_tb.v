@@ -84,12 +84,12 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			// waiting for trigger.
 			if (!spi_cs) begin
 				$error("CS not set during xfer");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			if (!xfer_idle) begin
 				$error("xfer_idle not set before xfer");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			data_tx = test_mosi_value;
@@ -100,7 +100,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 
 			if (xfer_idle) begin
 				$error("xfer_idle set during xfer");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			if (normalized_clk) begin
@@ -115,7 +115,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 				// latch on CS
 				spi_miso = |(slave_buf_tx & current_mask);
 
-				while (current_mask) begin
+				while (current_mask != 0) begin
 					@(posedge normalized_clk)
 					if (spi_mosi) begin
 						slave_buf_rx |= current_mask;
@@ -129,7 +129,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 
 			end else begin
 				// latch on first CLK edge
-				while (current_mask) begin
+				while (current_mask != 0) begin
 					@(posedge normalized_clk)
 					spi_miso = |(slave_buf_tx & current_mask);
 					@(negedge normalized_clk)
@@ -145,28 +145,28 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			#1;
 			if (slave_buf_rx != test_mosi_value) begin
 				$error("MOSI sent %d but received %d", test_mosi_value, slave_buf_rx);
-				errors += 1;
+				errors = errors + 1;
 			end
 			if (data_rx != slave_buf_tx) begin
 				$error("MISO sent %d but received %d", slave_buf_tx, data_rx);
-				errors += 1;
+				errors = errors + 1;
 			end
 			if (!xfer_idle) begin
 				$error("xfer_idle not set after xfer");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			#2;
 			if (xfer_word_completed) begin
 				$error("xfer_word_completed held for longer than one clock!");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			// regression:
 			// should still show the same output after xfer_word_completed was released
 			if (data_rx != slave_buf_tx) begin
 				$error("received data latched in data_rx invalid after xfer_word_completed was released! MISO sent %d but received %d", slave_buf_tx, data_rx);
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			#1;
@@ -187,10 +187,10 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 
 			if (spi_cs) begin
 				$error("CS set but no xfer");
-				errors += 1;
+				errors = errors + 1;
 			end
 
-			clk_div = test_clk_div;
+			clk_div = test_clk_div[19:0];
 			cpol = test_cpol;
 			cpha = test_cpha;
 			msb_first = test_msb_first;
@@ -200,7 +200,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 
 			if (!spi_cs) begin
 				$error("CS not set during xfer");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			check_single_word_xfer(test_cpol, test_msb_first, test_miso_value, test_mosi_value);
@@ -209,7 +209,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			#2;
 			if (spi_cs) begin
 				$error("CS set after xfer completed");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			#10;
@@ -234,10 +234,10 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 
 			if (spi_cs) begin
 				$error("CS set but no xfer");
-				errors += 1;
+				errors = errors + 1;
 			end
 
-			clk_div = test_clk_div;
+			clk_div = test_clk_div[19:0];
 			cpol = test_cpol;
 			cpha = test_cpha;
 			msb_first = test_msb_first;
@@ -247,7 +247,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 
 			if (!spi_cs) begin
 				$error("CS not set during xfer");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			check_single_word_xfer(test_cpol, test_msb_first, test_miso_value1, test_mosi_value1);
@@ -258,7 +258,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			#2;
 			if (spi_cs) begin
 				$error("CS set after xfer completed");
-				errors += 1;
+				errors = errors + 1;
 			end
 
 			#10;
@@ -274,25 +274,25 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 		for(polarity = 0; polarity <= 1; polarity++) begin: check_all_polaritytypes
 			for(phase = 0; phase <= 1; phase++) begin: check_all_phasetypes
 				for(msb = 0; msb <= 1; msb++) begin: check_all_msbtypes
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b1010, 4'b0110);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b0000, 4'b1111);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b0101, 4'b1010);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b1111, 4'b0000);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b0001, 4'b1000);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b0010, 4'b0100);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b0100, 4'b0010);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b1000, 4'b0001);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b1110, 4'b0111);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b1101, 4'b1011);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b1011, 4'b1101);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b0111, 4'b1110);
-					check_full_xfer_simple(4, polarity, phase, msb, 4'b1110, 4'b1110);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b1010, 4'b0110);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b0000, 4'b1111);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b0101, 4'b1010);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b1111, 4'b0000);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b0001, 4'b1000);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b0010, 4'b0100);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b0100, 4'b0010);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b1000, 4'b0001);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b1110, 4'b0111);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b1101, 4'b1011);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b1011, 4'b1101);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b0111, 4'b1110);
+					check_full_xfer_simple(4, polarity[0], phase[0], msb[0], 4'b1110, 4'b1110);
 
-					check_full_xfer_long(4, polarity, phase, msb, 4'b0000, 4'b1111, 4'b0000,  4'b1010, 4'b0101, 4'b1100);
-					check_full_xfer_long(4, polarity, phase, msb, 4'b1010, 4'b0101, 4'b1100,  4'b0000, 4'b1111, 4'b0000);
-					check_full_xfer_long(4, polarity, phase, msb, 4'b1010, 4'b0000, 4'b0101,  4'b0110, 4'b1111, 4'b1010);
+					check_full_xfer_long(4, polarity[0], phase[0], msb[0], 4'b0000, 4'b1111, 4'b0000,  4'b1010, 4'b0101, 4'b1100);
+					check_full_xfer_long(4, polarity[0], phase[0], msb[0], 4'b1010, 4'b0101, 4'b1100,  4'b0000, 4'b1111, 4'b0000);
+					check_full_xfer_long(4, polarity[0], phase[0], msb[0], 4'b1010, 4'b0000, 4'b0101,  4'b0110, 4'b1111, 4'b1010);
 
-					check_full_xfer_simple(4'b1111, polarity, phase, msb, 4'b1010, 4'b0101);
+					check_full_xfer_simple('b1111, polarity[0], phase[0], msb[0], 4'b1010, 4'b0101);
 				end
 			end
 		end

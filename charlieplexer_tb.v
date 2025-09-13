@@ -72,7 +72,7 @@ module charlieplexer_tb();
 		// 	- all others must be in tristate.
 		for(i=0; i<PINCOUNT*(PINCOUNT-1); i=i+1) begin
 			#1;
-			dut_in = i;
+			dut_in = i[INDEXBITS-1:0];
 			dut_enable = 1;
 
 			#1;
@@ -139,7 +139,7 @@ module charlieplexer_tb();
 					end
 				end else begin
 					if(grid[vcc][gnd] != 1) begin
-						$error("combination hit %0d times, should have been once: (vcc %0d, gnd %0d)", vcc, gnd);
+						$error("combination hit %0d times, should have been once: (vcc %0d, gnd %0d)", grid[vcc][gnd], vcc, gnd);
 						errors = errors + 1;
 					end
 				end

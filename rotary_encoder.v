@@ -36,9 +36,9 @@ module rotary_encoder(input wire clk, input wire in_a, input wire in_b, output w
 			assign debounced_b = in_b;
 		end else begin
 			debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
-				input_a_debouncer(.clk(clk), .in(in_a), .out(debounced_a));
+				input_a_debouncer(.clk(clk), .in(in_a), .out_state(debounced_a), .out_edge());
 			debouncer #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES))
-				input_b_debouncer(.clk(clk), .in(in_b), .out(debounced_b));
+				input_b_debouncer(.clk(clk), .in(in_b), .out_state(debounced_b), .out_edge());
 		end
 	endgenerate
 

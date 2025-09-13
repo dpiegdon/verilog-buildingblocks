@@ -51,8 +51,9 @@ module simple_spi_slave_tb();
 		.pin_miso_en(pin_miso_en),
 		.value_miso(dut_miso_out),
 		.value_mosi(dut_mosi_in),
-		.cs_stop(dut_cs_stop),
+		.cs_active(),
 		.cs_start(dut_cs_start),
+		.cs_stop(dut_cs_stop),
 		.value_valid(dut_value_valid));
 	
 	always @(posedge system_clock) begin
@@ -106,11 +107,11 @@ module simple_spi_slave_tb();
 			clock_word(mosi_value);
 			if(slave_mosi_buffer != mosi_value) begin
 				$error("MOSI sent %d but received %d", mosi_value, slave_mosi_buffer);
-				errors += 1;
+				errors = errors + 1;
 			end
 			if(master_miso_buffer != miso_value) begin
 				$error("MISO sent %d but received %d", miso_value, master_miso_buffer);
-				errors += 1;
+				errors = errors + 1;
 			end
 			#100;
 		end
@@ -139,7 +140,7 @@ module simple_spi_slave_tb();
 		check_full_transfert(4'b0111, 4'b1110);
 		check_full_transfert(4'b1110, 4'b1110);
 
-		if(errors) begin
+		if (errors != 0) begin
 			$error("FAIL: collected %d errors", errors);
 			$fatal();
 		end else begin

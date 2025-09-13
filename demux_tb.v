@@ -40,7 +40,7 @@ module demux_tb();
 
 		for(i=0; i<OUTPUT_WIDTH; i=i+1) begin
 			dut_enable = 1;
-			dut_selector = i;
+			dut_selector = i[SELECTOR_WIDTH-1:0];
 			
 			#1
 
