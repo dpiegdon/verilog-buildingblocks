@@ -20,12 +20,14 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 // Implements a generic linear feedback shift register that allows to shift
 // additional random bits into the front to improve its randomness.
+// set random to const 1'b0 if unused.
 // The default parameters match to a fibonacci LFSR.
 module lfsr(input wire clk, input wire random, output reg [WIDTH-1:0] shiftreg, input wire rst);
 
 	parameter WIDTH = 'd16;
 	parameter INIT_VALUE = 16'b1010_1100_1110_0001;
 	parameter FEEDBACK = 16'b0000_0000_0010_1101;
+	parameter INVERSE = 0;		// feedback into high side (normal) or into low side (inverse)?
 
 	wire feedback;
 	reg init_done = 0;
@@ -37,7 +39,11 @@ module lfsr(input wire clk, input wire random, output reg [WIDTH-1:0] shiftreg, 
 			shiftreg <= INIT_VALUE;
 			init_done <= 1;
 		end else begin
-			shiftreg <= {feedback, shiftreg[WIDTH-1:1]};
+			if (INVERSE) begin
+				shiftreg <= {shiftreg[WIDTH-2:0], feedback};
+			end else begin
+				shiftreg <= {feedback, shiftreg[WIDTH-1:1]};
+			end
 		end
 	end
 
