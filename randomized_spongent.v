@@ -23,7 +23,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
  * This should be a comparably secure source of randomness, especially since a lot
  * of randomness is merged into each input bit due to the slowness of spongent.
  */
-module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0] out, output wire out_valid, input wire out_received);
+module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0] out, output wire out_valid, input wire out_received, output wire metastable);
 	parameter HASHSIZE = 88; 			// `n` in paper
 	parameter CAPACITY = 80; 			// `c` in paper
 	parameter RATE = 8; 				// `r` in paper
@@ -35,7 +35,6 @@ module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0
 							// since our input already has plenty of entropy merged into each bit.
 							// but since the first byte we absorb is always 8'h0, we add two more.
 
-	wire metastable;
 	reg [3:0] rng_input = 0;	// shift through a few FFs to get rid of metastable state before actually using it
 
 `ifdef TESTBENCH

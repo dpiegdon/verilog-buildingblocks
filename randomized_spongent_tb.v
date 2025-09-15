@@ -27,8 +27,9 @@ module randomized_spongent_tb();
 	wire [7:0] out;
 	wire out_valid;
 	reg out_received = 0;
+	wire metastable;
 
-	randomized_spongent sponge(clk[0], rst, out, out_valid, out_received);
+	randomized_spongent sponge(clk[0], rst, out, out_valid, out_received, metastable);
 
 	always #1 clk = clk + 1;
 
