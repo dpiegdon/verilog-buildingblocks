@@ -15,12 +15,12 @@ clean:
 	@-rm -f *_tb.test
 	@-rm -f *_tb.vcd
 
-simple_spi_slave_tb.test: simple_spi_slave_tb.v simple_spi_slave.v synchronizer.v
+simple_spi_slave_tb.test: simple_spi_slave.v synchronizer.v
 
-simple_spi_master_tb.test: simple_spi_master_tb.v simple_spi_master.v synchronizer.v
+simple_spi_master_tb.test: simple_spi_master.v synchronizer.v
 
-spongent_hash_tb.test: spongent_hash_tb.v spongent_hash.v lfsr.v
+spongent_hash_tb.test: spongent_hash.v lfsr.v
 
 %_tb.test: %.v
-	verilator +1800-2012ext+v --lint-only -Wall --bbox-unsup $<
-	iverilog  -g2012 -Wall -Wno-timescale -o $@ $^
+	verilator --top-module $(patsubst %_tb.test,%,$@) +1800-2012ext+v --lint-only -Wall --bbox-unsup $(patsubst %_tb.test,%.v,$@)
+	iverilog -g2012 -Wall -Wno-timescale -o $@ $^ $(patsubst %.test,%.v,$@)

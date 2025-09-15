@@ -19,68 +19,83 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 
 /* Nibble-serial Spongent hash implementation.
+ * (Trading speed for smaller size.)
  *
  * Spongent is a family of lightweight cryptographic hash functions designed for
  * constrained hardware.
- * 
+ *
  * It combines a simple sponge construction with a PRESENT-style permutation:
- * each round 
- * - XORs in a round constant (lCounter)
- * - applies a fixed 4-bit S-box to every nibble of the state (sBoxLayer)
- * - and permutes the bits with a deterministic shuffle (pLayer)
- * 
- * Different variants (e.g. Spongent-88, Spongent-128) trade off state size,
- * security margin, and number of rounds, but all share the same structure. The
- * design is compact enough to fit into very small FPGAs or ASICs, yet provides
- * cryptographic-grade diffusion and nonlinearity suitable for tasks like
- * entropy whitening, lightweight authentication, or low-end integrity checks.
+ * Each round
+ *   - XORs in a round constant (lCounter)
+ *   - applies a fixed 4-bit S-box to every nibble of the state (sBoxLayer)
+ *   - and permutes the bits with a deterministic shuffle (pLayer)
+ *
+ * See the testbench for parameters (HASHSIZE, CAPACITY, RATE, ROUNDS,
+ * LCOUNTER_FEEDBACK, LCOUNTER_INIT) of the standard variants of the family:
+ *   - SPONGENT-088-080-008
+ *   - SPONGENT-128-128-008
+ *   - SPONGENT-160-160-016
+ *   - SPONGENT-224-224-016
+ *   - SPONGENT-256-256-016
+ * Different variants trade off state size, security margin, and number of
+ * rounds, but all share the same structure. The design is compact enough
+ * to fit into very small FPGAs or ASICs, yet provides cryptographic-grade
+ * diffusion and nonlinearity suitable for tasks like entropy whitening,
+ * lightweight authentication, or low-end integrity checks.
+ *
+ * Also see ISO/IEC 29192-5:2016.
+ * NOTE: This implementation has been created WITHOUT ISO/IEC 29192-5:2016,
+ *       but instead by using the original papers and reference implementations
+ *       from the internet. See References below.
  *
  * Reference documentation:
- * - Spongent: The Design Space of Lightweight Cryptographic Hashing.
+ * - Spongent: A Lightweight Hash Function
  *   By A. Bogdanov, M. Knežević, G. Leander, D. Toz, K. Varıcı, I. Verbauwhede.
- *   In CHES 2011: Cryptographic Hardware and Embedded Systems – CHES 2011, LNCS 6917, pp. 145–162.
+ *   In CHES 2011: Cryptographic Hardware and Embedded Systems – CHES 2011, LNCS 6917, pp. 312-325,
  *   Springer, 2011.
  *
  * - Spongent: The Design Space of Lightweight Cryptographic Hashing.
  *   By A. Bogdanov, M. Knežević, G. Leander, D. Toz, K. Varıcı, I. Verbauwhede.
  *
- * Reference implementations:
+ * - ISO/IEC 29192-5:2016 (not used for this implementation)
+ *
+ * Used reference implementations:
  * - https://github.com/joostrijneveld/readable-crypto/blob/master/hashfunctions/SPONGENT.py
  * - https://github.com/ehsanaerabi/HashFunctions/blob/master/Spongent/SourceCode/Spongent.h
  * - https://github.com/ehsanaerabi/HashFunctions/blob/master/Spongent/SourceCode/Spongent.cpp
  */
 module spongent_hash(
 			input  wire clk,		// system clock
-			input  wire rst,		// reset full state
-			input  wire [RATE-1:0] in,	// chunk of input data
-			input  wire in_valid,		// input chunk is valid?
-			input  wire in_completed,	// all input data was completely absorbed? I.e. transition to output mode?
-			output reg  in_received = 0,	// input chunk was received?
-			output wire [RATE-1:0] out,	// chunk of output data
-			output reg  out_valid = 0,	// output chunk is valid?
-			output reg  out_completed = 0,  // output hash fully received?
-			input  wire out_received        // output chunk was received?
+			input  wire rst,		// reset full state (needs a clock cycle)
+			input  wire [RATE-1:0] in,	// next chunk of input data
+			input  wire in_valid,		// is input chunk valid?
+			input  wire in_completed,	// was all input data completely received? (I.e. transition to output mode?)
+			output reg  in_received = 0,	// was input chunk received?
+			output wire [RATE-1:0] out,	// next chunk of output data
+			output reg  out_valid = 0,	// is output chunk valid?
+			output reg  out_completed = 0,  // was output hash fully received?
+			input  wire out_received        // was output chunk received?
 		);
 	parameter HASHSIZE = 88; 			// `n` in paper
 	parameter CAPACITY = 80; 			// `c` in paper
 	parameter RATE = 8; 				// `r` in paper
 	parameter ROUNDS = 45; 				// `R` in paper
 	parameter LCOUNTER_FEEDBACK = 'b110000;		// Feedback definition of the lCounter LFSR.
-	parameter LCOUNTER_INIT = 'b000101;		// Initial value of the lCounter LFSR.
-	parameter FIX_BYTE_ORDER = 1;			// inverse byteorder of input and output, so that the verilog-expected way of passing bits matches the software implementation.
+	parameter LCOUNTER_INIT = 'h5;			// Initial value of the lCounter LFSR.
+	parameter FIX_BYTE_ORDER = 1;			// inverse byteorder of input and output, so that the verilog-expected way of passing bits matches the software implementation?
 
-	localparam STATESIZE = CAPACITY + RATE;		// `b`
+	localparam STATESIZE = CAPACITY + RATE;		// `b` in paper
 	localparam STATEMIDDLE = (((STATESIZE/2)/4)*4); // nibble-aligned middle of state
-	localparam NIBBLES = STATESIZE / 4;		// statesize in nibbles (half bytes)
+	localparam NIBBLES = STATESIZE / 4;		// size of state in nibbles (half bytes)
 	localparam OUTPUT_CHUNKS = HASHSIZE / RATE;	// number of rate-sized chunks the total hash consists off
 
 	generate
-		if (       (HASHSIZE == 0) 
-			|| (CAPACITY <= 1)
-			|| (RATE <= 1)
-			|| (ROUNDS == 0)
-			|| (LCOUNTER_FEEDBACK == 0)
-			|| (LCOUNTER_INIT == 0)) begin : invalid_parameters
+		if (       (HASHSIZE < 88)
+			|| (CAPACITY < 80)
+			|| (RATE < 8)
+			|| (ROUNDS < 45)
+			|| (LCOUNTER_FEEDBACK <= 0)
+			|| (LCOUNTER_INIT <= 0)) begin : invalid_parameters
 			/* raise an error for invalid/uninitialized parameters */
 			INVALID_OR_UNINITIALIZED_PARAMETERS not_a_real_instance();
 		end
@@ -88,8 +103,10 @@ module spongent_hash(
 
 	reg [STATESIZE-1:0] state = 0;			// internal state
 	wire [STATESIZE-1:0] state_nibbleshifted = { state[STATESIZE-1-4 : 0], state[STATESIZE-1 : STATESIZE-1-3] };
+							// internal state shifted by one nibble
 
-	/* i/o with more than 1 byte is expected in reverse byte order */
+	/* i/o with more than 1 byte may be expected in reverse byte order,
+	 * so let's swap these around */
 	wire [RATE-1:0] in_byteorder_fixed;
 	wire [RATE-1:0] out_byteorder_fixed;
 	generate
@@ -171,20 +188,19 @@ module spongent_hash(
 	endgenerate
 
 	/* main logic */
-	reg [$clog2(ROUNDS)-1:0] rounds_left;		// # of rounds to be done
 	localparam MODE_INPUT            = 0;
 	localparam MODE_RELEASE_LFSR     = 1;
-	localparam MODE_PREPARE_ROUNDS = 2;
+	localparam MODE_PREPARE_ROUNDS   = 2;
 	localparam MODE_INJECTION        = 3;
 	localparam MODE_SUBSTITUTE       = 4;
 	localparam MODE_PERMUTE          = 5;
 	localparam MODE_OUTPUT           = 6;
-	reg [2:0] mode = MODE_INPUT;			// current mode
-	reg squeezing = 0;				// are we in the absorbing- or squeezing-phase?
+	reg [2:0] mode = MODE_INPUT;				// current mode
+	reg [$clog2(ROUNDS)-1:0] rounds_left = 0;		// # of rounds remaining to be done
+	reg squeezing = 0;					// are we in the absorbing- or squeezing-phase?
+	reg [$clog2(OUTPUT_CHUNKS-1)-1:0] out_remaining = 0;	// number of output chunks remaining to be generated
 
 	assign out_byteorder_fixed = state[RATE-1:0];
-
-	reg [$clog2(OUTPUT_CHUNKS-1)-1:0] out_remaining = 0;
 
 	always @(posedge clk) begin
 		if (rst) begin
