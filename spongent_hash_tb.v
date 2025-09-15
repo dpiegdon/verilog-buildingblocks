@@ -30,23 +30,25 @@ module spongent_hash_specific_tb(output reg finished,
 	parameter LCOUNTER_INIT = 'h5;			// Initial value of the lCounter LFSR.
 
 	localparam input_length = 27*8;
-	reg [input_length-1 : 0] hash_input = "Sponge + Present = Spongent";
+	localparam input_message = "Sponge + Present = Spongent";
+
+	reg [input_length-1 : 0] hash_input;
 
 	integer input_index = 0;
 	reg [HASHSIZE-1:0] hash_result = 23;
 	integer result_index = 0;
 
-	reg clk = 0;
-	reg rst = 1;
-	reg [RATE-1:0] in = 0;
-	reg in_valid = 0;
-	reg in_completed = 0;
+	reg clk;
+	reg rst;
+	reg [RATE-1:0] in;
+	reg in_valid;
+	reg in_completed;
 	wire in_received;
 	wire [RATE-1:0] out;
 	wire out_valid;
 	wire out_completed;
-	reg out_received = 0;
-	reg [RATE-1:0] padding = 1 << (RATE-1);
+	reg out_received;
+	reg [RATE-1:0] padding;
 
 	integer cyclecount;
 
@@ -76,87 +78,126 @@ module spongent_hash_specific_tb(output reg finished,
 		end
 	endtask
 
+	integer reset_count;
+	integer test_for_resets;
+
+	task automatic identify;
+		begin
+			$error("for HASHSIZE %d, CAPACITY %d, RATE %d, ROUNDS %d, LCOUNTER_FEEDBACK %d, LCOUNTER_INIT %d, reset_count %d:",
+				HASHSIZE, CAPACITY, RATE, ROUNDS, LCOUNTER_FEEDBACK, LCOUNTER_INIT, reset_count);
+		end
+	endtask
+
 	initial begin
-		/* exit reset */
-		rst = 0;
-		cycle;
-
-		if (in_received || out_valid || out_completed) begin
-			$error("unexpected state in_received %b out_valid %b", in_received, out_valid);
-			errors = errors + 1;
-		end
-
-		/* absorbing phase */
-		for (input_index = input_length-1+8; input_index > 0; input_index = input_index-RATE) begin
-			//                       ^^ +8 to send a single padding structure at the end
-			in = hash_input[input_length-1:input_length-RATE];
-			hash_input = { hash_input[input_length-RATE-1:0], padding };  // NOTE: this appends padding-structure
-			padding = 0;
-			in_valid = 1;
-			cyclecount = 0;
-			while (!in_received && (cyclecount <= 1000000)) begin
-				cycle;
-				cyclecount = cyclecount + 1;
-				if (cyclecount > 1000000) begin
-					$error("single absorbe cycle took to long");
-					errors = errors + 1;
-				end
-			end
-			in_valid = 0;
-			cycle;
-		end
-		in_completed = 1;
-		cycle;
-
-		/* squeeze phase */
-		for (result_index = HASHSIZE; (result_index > 0) && !out_completed; result_index = result_index - RATE) begin
-			cyclecount = 0;
-			while (!out_valid && (cyclecount <= 1000000)) begin
-				cycle;
-				cyclecount = cyclecount + 1;
-				if (cyclecount > 1000000) begin
-					$error("single squeeze cycle took to long");
-					errors = errors + 1;
-				end
-			end
-			if (out_valid) begin
-				hash_result = {hash_result[HASHSIZE-1-RATE:0], out};
-				out_received = 1;
-				cycle;
-				out_received = 0;
-			end
-		end
-
-		cycle;
-		cycle;
-		cycle;
-		cycle;
-
-		if (!out_completed) begin
-			$error("result is too long for hash!");
-			errors = errors + 1;
-		end
-		if (result_index != 0) begin
-			$error("result is too short for hash!");
-			errors = errors + 1;
-		end
-
-		/* check result */
-		if (^hash_result === 1'bx) begin
-			$error("X-value 0x%h instead of 0x%h", hash_result, expected_result);
-			errors = errors + 1;
-		end
-		if (^hash_result === 1'bz) begin
-			$error("Z-value 0x%h instead of 0x%h", hash_result, expected_result);
-			errors = errors + 1;
-		end
-		if (expected_result === hash_result) begin
-			/* fine */
+		if (HASHSIZE==88) begin
+			// test that reset also works (just for a smaller hash,
+			// so that the test doesn't take forever)
+			test_for_resets = 2;
 		end else begin
-			$error("received hash 0x%h instead of expected 0x%h", hash_result, expected_result);
-			errors = errors + 1;
+			test_for_resets = 1;
 		end
-		finished = 1;
+
+		for (reset_count = 0; reset_count < test_for_resets; reset_count = reset_count+1) begin
+			rst = 1;
+
+			hash_input = input_message;
+			hash_result = 23 + reset_count;
+			result_index = 0;
+			in = 0;
+			in_valid = 0;
+			in_completed = 0;
+			out_received = 0;
+			padding = 1 << (RATE-1);
+
+			cycle;
+			rst = 0;
+			cycle;
+
+			if (in_received || out_valid || out_completed) begin
+				identify;
+				$error("unexpected state in_received %b out_valid %b", in_received, out_valid);
+				errors = errors + 1;
+			end
+
+			/* absorbing phase */
+			for (input_index = input_length-1+8; input_index > 0; input_index = input_index-RATE) begin
+				//                       ^^ +8 to send a single padding structure at the end
+				in = hash_input[input_length-1:input_length-RATE];
+				hash_input = { hash_input[input_length-RATE-1:0], padding };  // NOTE: this appends padding-structure
+				padding = 0;
+				in_valid = 1;
+				cyclecount = 0;
+				while (!in_received && (cyclecount <= 1000000)) begin
+					cycle;
+					cyclecount = cyclecount + 1;
+					if (cyclecount > 1000000) begin
+						identify;
+						$error("single absorbe cycle took to long");
+						errors = errors + 1;
+					end
+				end
+				in_valid = 0;
+				cycle;
+			end
+			in_completed = 1;
+			cycle;
+
+			/* squeeze phase */
+			for (result_index = HASHSIZE; (result_index > 0) && !out_completed; result_index = result_index - RATE) begin
+				cyclecount = 0;
+				while (!out_valid && (cyclecount <= 1000000)) begin
+					cycle;
+					cyclecount = cyclecount + 1;
+					if (cyclecount > 1000000) begin
+						identify;
+						$error("single squeeze cycle took to long");
+						errors = errors + 1;
+					end
+				end
+				if (out_valid) begin
+					hash_result = {hash_result[HASHSIZE-1-RATE:0], out};
+					out_received = 1;
+					cycle;
+					out_received = 0;
+				end
+			end
+
+			cycle;
+			cycle;
+			cycle;
+			cycle;
+
+			if (!out_completed) begin
+				identify;
+				$error("result is too long for hash!");
+				errors = errors + 1;
+			end
+			if (result_index != 0) begin
+				identify;
+				$error("result is too short for hash!");
+				errors = errors + 1;
+			end
+
+			/* check result */
+			if (^hash_result === 1'bx) begin
+				identify;
+				$error("X-value 0x%h instead of 0x%h", hash_result, expected_result);
+				errors = errors + 1;
+			end
+			if (^hash_result === 1'bz) begin
+				identify;
+				$error("Z-value 0x%h instead of 0x%h", hash_result, expected_result);
+				errors = errors + 1;
+			end
+			if (expected_result === hash_result) begin
+				/* fine */
+			end else begin
+				identify;
+				$error("received hash 0x%h instead of expected 0x%h", hash_result, expected_result);
+				errors = errors + 1;
+			end
+			finished = 1;
+		end
 	end
 endmodule
 
