@@ -28,6 +28,7 @@ module spongent_hash_specific_tb(output reg finished,
 	parameter ROUNDS = 45; 				// `R` in paper
 	parameter LCOUNTER_FEEDBACK = 'b110000;		// Feedback definition of the lCounter LFSR.
 	parameter LCOUNTER_INIT = 'h5;			// Initial value of the lCounter LFSR.
+	parameter SBOX_DOUBLETIME = 0;			// Use two sbox (8-bit serial) instead of one (4-bit serial)?
 
 	localparam input_length = 27*8;
 	localparam input_message = "Sponge + Present = Spongent";
@@ -57,7 +58,8 @@ module spongent_hash_specific_tb(output reg finished,
 			.RATE(RATE),
 			.ROUNDS(ROUNDS),
 			.LCOUNTER_FEEDBACK(LCOUNTER_FEEDBACK),
-			.LCOUNTER_INIT(LCOUNTER_INIT))
+			.LCOUNTER_INIT(LCOUNTER_INIT),
+			.SBOX_DOUBLETIME(SBOX_DOUBLETIME))
 		hash(	.clk(clk),
 			.rst(rst),
 			.in(in),
@@ -204,7 +206,7 @@ endmodule
 module spongent_hash_tb();
 	integer errors = 0;
 
-	localparam SUBTESTS = 5;
+	localparam SUBTESTS = 6;
 	wire [SUBTESTS-1:0] subtest_finished;
 	wire [15:0] subtest_errors[SUBTESTS-1:0];
 
@@ -219,6 +221,19 @@ module spongent_hash_tb();
 					subtest_errors[0],
 					88'h69971bf96def95bfc46822);
 
+	spongent_hash_specific_tb #(	.HASHSIZE(88),
+					.CAPACITY(80),
+					.RATE(8),
+					.ROUNDS(45),
+					.LCOUNTER_FEEDBACK('b110000),
+					.LCOUNTER_INIT('h5),
+					.SBOX_DOUBLETIME(1))
+			spongent_088_080_008_doubletime(		// version: 88808 / SPONGENT-088-080-008
+					subtest_finished[1],
+					subtest_errors[1],
+					88'h69971bf96def95bfc46822);
+
+
 	spongent_hash_specific_tb #(	.HASHSIZE(128),
 					.CAPACITY(128),
 					.RATE(8),
@@ -226,8 +241,8 @@ module spongent_hash_tb();
 					.LCOUNTER_FEEDBACK('b1100000),
 					.LCOUNTER_INIT('h7a))
 			spongent_128_128_008(				// version: 1281288 / SPONGENT-128-128-008
-					subtest_finished[1],
-					subtest_errors[1],
+					subtest_finished[2],
+					subtest_errors[2],
 					128'h6b7ba35eb09de0f8def06ae555694c53
 					);
 
@@ -238,8 +253,8 @@ module spongent_hash_tb();
 					.LCOUNTER_FEEDBACK('b1100000),
 					.LCOUNTER_INIT('h45))
 			spongent_160_160_016(				// version: 16016016 / SPONGENT-160-160-016
-					subtest_finished[2],
-					subtest_errors[2],
+					subtest_finished[3],
+					subtest_errors[3],
 					160'h13188a4917ea29e258362c047b9bf00c22b5fe91
 					);
 
@@ -248,10 +263,11 @@ module spongent_hash_tb();
 					.RATE(16),
 					.ROUNDS(120),
 					.LCOUNTER_FEEDBACK('b1100000),
-					.LCOUNTER_INIT('h01))
-			spongent_224_224_016(				// version: 22422416 / SPONGENT-224-224-016
-					subtest_finished[3],
-					subtest_errors[3],
+					.LCOUNTER_INIT('h01),
+					.SBOX_DOUBLETIME(1))
+			spongent_224_224_016_doubletime(		// version: 22422416 / SPONGENT-224-224-016
+					subtest_finished[4],
+					subtest_errors[4],
 					224'h8443b12d2eee4e09969a183205f5f7f684a711a5be079a15f4ccdc30
 					);
 
@@ -260,10 +276,11 @@ module spongent_hash_tb();
 					.RATE(16),
 					.ROUNDS(140),
 					.LCOUNTER_FEEDBACK('b10001110),
-					.LCOUNTER_INIT('h9e))
-			spongent_256_256_016(				// version: 25625616 / SPONGENT-256-256-016
-					subtest_finished[4],
-					subtest_errors[4],
+					.LCOUNTER_INIT('h9e),
+					.SBOX_DOUBLETIME(1))
+			spongent_256_256_016_doubletime(		// version: 25625616 / SPONGENT-256-256-016
+					subtest_finished[5],
+					subtest_errors[5],
 					256'h67dc8fc8b2edba6e55f4e68ec4f2b2196fe38df9b1a760f4d43b4669160bf5a8
 					);
 

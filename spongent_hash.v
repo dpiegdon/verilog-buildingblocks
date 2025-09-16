@@ -19,7 +19,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 
 /* Nibble-serial Spongent hash implementation.
- * (Trading speed for smaller size.)
+ * (Trading speed for smaller size. Can optionally enable byte-serial to
+ * improve speed by factor of ~1.8)
  *
  * Spongent is a family of lightweight cryptographic hash functions designed for
  * constrained hardware.
@@ -83,6 +84,9 @@ module spongent_hash(
 	parameter LCOUNTER_FEEDBACK = 'b110000;		// Feedback definition of the lCounter LFSR.
 	parameter LCOUNTER_INIT = 'h5;			// Initial value of the lCounter LFSR.
 	parameter FIX_BYTE_ORDER = 1;			// inverse byteorder of input and output, so that the verilog-expected way of passing bits matches the software implementation?
+	parameter SBOX_DOUBLETIME = 0;			// use two sbox (8-bit serial) instead of one (4-bit serial)?
+							// This increases needed LUTs, but also increases speed by a factor of ~1.8.
+							// This *can* also reduce place&route-pressure on needed wires.
 
 	localparam STATESIZE = CAPACITY + RATE;		// `b` in paper
 	localparam STATEMIDDLE = (((STATESIZE/2)/4)*4); // nibble-aligned middle of state
@@ -102,8 +106,10 @@ module spongent_hash(
 	endgenerate
 
 	reg [STATESIZE-1:0] state = 0;			// internal state
-	wire [STATESIZE-1:0] state_nibbleshifted = { state[STATESIZE-1-4 : 0], state[STATESIZE-1 : STATESIZE-1-3] };
-							// internal state shifted by one nibble
+
+	// internal state shifted by one sBox-application (nibble or byte, depending on SBOX_DOUBLETIME)
+	wire [STATESIZE-1:0] state_sboxshifted = (SBOX_DOUBLETIME ? { state[STATESIZE-1-8 : 0], state[STATESIZE-1 : STATESIZE-1-7] }
+								  : { state[STATESIZE-1-4 : 0], state[STATESIZE-1 : STATESIZE-1-3] });
 
 	/* i/o with more than 1 byte may be expected in reverse byte order,
 	 * so let's swap these around */
@@ -152,7 +158,7 @@ module spongent_hash(
 				};
 
 	/* substitution: sBox definitions */
-	reg [$clog2(NIBBLES)-1:0] sBoxNibblesLeft = 0;
+	reg [$clog2(NIBBLES)-1:0] sBoxShiftsLeft = 0;
 	function [3:0] sBoxLayer;
 		input [3:0] sBoxIn;
 		begin
@@ -208,7 +214,7 @@ module spongent_hash(
 			out_valid       <= 0;
 			out_completed   <= 0;
 			state           <= 0;
-			sBoxNibblesLeft <= 0;
+			sBoxShiftsLeft  <= 0;
 			lCounter_rst    <= 0;
 			lCounter_clk    <= 0;
 			rounds_left     <= 0;
@@ -242,21 +248,29 @@ module spongent_hash(
 				state <= lCounter_outstate;
 				lCounter_clk <= 1;
 				mode <= MODE_SUBSTITUTE;
-				sBoxNibblesLeft <= NIBBLES[$clog2(NIBBLES)-1:0] - 1;
+				sBoxShiftsLeft <= NIBBLES[$clog2(NIBBLES)-1:0] / (SBOX_DOUBLETIME ? 2 : 1) - 1;
 			end
 
 			MODE_SUBSTITUTE: begin
 				lCounter_clk <= 0;
-				// applying the sBox to the middle nibble
-				// because the LUTs at start/end of state
-				// already have extra logic due to lCounter.
-				state <= {
-								state_nibbleshifted[STATESIZE-1 : STATEMIDDLE+4],
-						sBoxLayer(	state_nibbleshifted[STATEMIDDLE+3 : STATEMIDDLE]	),
-								state_nibbleshifted[STATEMIDDLE-1 : 0]
-					};
-				if (sBoxNibblesLeft != 0) begin
-					sBoxNibblesLeft <= sBoxNibblesLeft - 1;
+				// applying the sBox to the middle nibble (or byte) because the LUTs
+				// at start/end of state already have extra logic due to lCounter.
+				if (SBOX_DOUBLETIME) begin
+					state <= {
+									state_sboxshifted[STATESIZE-1 : STATEMIDDLE+4],
+							sBoxLayer(	state_sboxshifted[STATEMIDDLE+3 : STATEMIDDLE]		),
+							sBoxLayer(	state_sboxshifted[STATEMIDDLE-1 : STATEMIDDLE-4]	),
+									state_sboxshifted[STATEMIDDLE-5 : 0]
+						};
+				end else begin
+					state <= {
+									state_sboxshifted[STATESIZE-1 : STATEMIDDLE+4],
+							sBoxLayer(	state_sboxshifted[STATEMIDDLE+3 : STATEMIDDLE]		),
+									state_sboxshifted[STATEMIDDLE-1 : 0]
+						};
+				end
+				if (sBoxShiftsLeft != 0) begin
+					sBoxShiftsLeft <= sBoxShiftsLeft - 1;
 				end else begin
 					mode <= MODE_PERMUTE;
 				end

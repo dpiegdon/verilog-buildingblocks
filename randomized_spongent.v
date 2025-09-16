@@ -30,6 +30,7 @@ module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0
 	parameter ROUNDS = 45; 				// `R` in paper
 	parameter LCOUNTER_FEEDBACK = 'b110000;		// Feedback definition of the lCounter LFSR.
 	parameter LCOUNTER_INIT = 'h5;			// Initial value of the lCounter LFSR.
+	parameter SBOX_DOUBLETIME = 0;			// use two sbox (8-bit serial) instead of one (4-bit serial)?
 
 	localparam SQUEEZE_AFTER = CAPACITY + RATE + 2;	// we can safely squeeze after inputting a single full state,
 							// since our input already has plenty of entropy merged into each bit.
@@ -65,7 +66,8 @@ module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0
 				.RATE(RATE),
 				.ROUNDS(ROUNDS),
 				.LCOUNTER_FEEDBACK(LCOUNTER_FEEDBACK),
-				.LCOUNTER_INIT(LCOUNTER_INIT))
+				.LCOUNTER_INIT(LCOUNTER_INIT),
+				.SBOX_DOUBLETIME(SBOX_DOUBLETIME))
 			hash(	clk, merged_reset,
 				in, in_valid, in_completed, in_received,
 				out, out_valid, out_completed, out_received);
