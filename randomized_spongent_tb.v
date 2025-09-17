@@ -29,28 +29,48 @@ module randomized_spongent_tb();
 	reg out_received = 0;
 	wire metastable;
 
+	integer received_count = 0;
+	reg [399:0] received_data = 0;
+
+	integer expected_count = 3*11 + 1;
+	reg [399:0] expected_data = 400'h00000000000000000000000000000000_7c700ee6d3489520eb261c_087b2de20369daeea85c50_087b2de20369daeea85c50_08;
+	/*                 first iteration has a differentstarting state--^^
+	 *                              second and thirt iterations have inverse state to first--^^---------------------^^
+	 *                                iteration stops immediately after start of fourth iteratation result (will be same as second/third)--^^
+	 */
+
+
+
 	randomized_spongent sponge(clk[0], rst, out, out_valid, out_received, metastable);
 
 	always #1 clk = clk + 1;
 
 	initial begin
+		/*
 		$dumpfile("randomized_spongent_tb.vcd");
 		$dumpvars;
-		$warning("testbench incomplete!");
+		*/
 
 		#1;
 		rst = 0;
 		#1;
 
-		while (clk < 'h09f000) begin
+		while (clk < 'h0a0604) begin
 			@(posedge out_valid);
-			$warning("out: 0x%x", out);
+//			$warning("out: 0x%x", out);
+			received_data = {received_data[399-8:0], out};
+			received_count = received_count + 1;
 			out_received = 1;
 			#4;
 			out_received = 0;
 			#4;
 		end
 
+		if ((received_data != expected_data)
+			|| (received_count != expected_count)) begin
+			$error("received     %d: 0x%x", received_count, received_data);
+			$error("but expected %d: 0x%x", expected_count, expected_data);
+		end
 
 
 		if(errors != 0) begin

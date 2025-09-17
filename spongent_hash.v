@@ -95,8 +95,11 @@ module spongent_hash(
 
 	generate
 		if (       (HASHSIZE < 88)
+			|| (HASHSIZE % 8 != 0)
 			|| (CAPACITY < 80)
+			|| (CAPACITY % 8 != 0)
 			|| (RATE < 8)
+			|| (RATE % 8 != 0)
 			|| (ROUNDS < 45)
 			|| (LCOUNTER_FEEDBACK <= 0)
 			|| (LCOUNTER_INIT <= 0)) begin : invalid_parameters
