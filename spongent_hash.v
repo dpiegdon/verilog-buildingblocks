@@ -91,9 +91,12 @@ module spongent_hash(
 	localparam STATESIZE = CAPACITY + RATE;		// `b` in paper
 	localparam STATEMIDDLE = (((STATESIZE/2)/4)*4); // nibble-aligned middle of state
 	localparam NIBBLES = STATESIZE / 4;		// size of state in nibbles (half bytes)
+	localparam SBOX_SHIFTS_PER_ROUND = NIBBLES / (SBOX_DOUBLETIME ? 2 : 1);
+							// total number of shifts needed during the serial sBox step
 	localparam OUTPUT_CHUNKS = HASHSIZE / RATE;	// number of rate-sized chunks the total hash consists off
 
 	generate
+		// weed out obviously bad parameters
 		if (       (HASHSIZE < 88)
 			|| (HASHSIZE % 8 != 0)
 			|| (CAPACITY < 80)
@@ -102,7 +105,8 @@ module spongent_hash(
 			|| (RATE % 8 != 0)
 			|| (ROUNDS < 45)
 			|| (LCOUNTER_FEEDBACK <= 0)
-			|| (LCOUNTER_INIT <= 0)) begin : invalid_parameters
+			|| (LCOUNTER_INIT <= 0)
+			|| (HASHSIZE % RATE != 0)) begin : invalid_parameters
 			/* raise an error for invalid/uninitialized parameters */
 			INVALID_OR_UNINITIALIZED_PARAMETERS not_a_real_instance();
 		end
@@ -153,15 +157,13 @@ module spongent_hash(
 				.shiftreg(lCounter),
 				.rst(lCounter_rst));
 	assign lCounter_outstate = {
-					/* verilator lint_off SELRANGE */
-					state[STATESIZE-1               : STATESIZE-LCOUNTER_SIZE]   	^ retnuoCl, // <-- inverse order is per spec.
-					/* verilator lint_on SELRANGE */
+					state[STATESIZE-1               : STATESIZE-LCOUNTER_SIZE]   	^ retnuoCl,
 					state[STATESIZE-LCOUNTER_SIZE-1 : LCOUNTER_SIZE],
 					state[LCOUNTER_SIZE-1           : 0]                       	^ lCounter
 				};
 
 	/* substitution: sBox definitions */
-	reg [$clog2(NIBBLES)-1:0] sBoxShiftsLeft = 0;
+	reg [$clog2(SBOX_SHIFTS_PER_ROUND)-1:0] sBoxShiftsLeft = 0;
 	function [3:0] sBoxLayer;
 		input [3:0] sBoxIn;
 		begin
@@ -196,7 +198,7 @@ module spongent_hash(
 		end
 	endgenerate
 
-	/* main logic */
+	/* statemachine for i/o- and round-tracking, and glue logic */
 	localparam MODE_INPUT            = 0;
 	localparam MODE_RELEASE_LFSR     = 1;
 	localparam MODE_PREPARE_ROUNDS   = 2;
@@ -251,7 +253,7 @@ module spongent_hash(
 				state <= lCounter_outstate;
 				lCounter_clk <= 1;
 				mode <= MODE_SUBSTITUTE;
-				sBoxShiftsLeft <= NIBBLES[$clog2(NIBBLES)-1:0] / (SBOX_DOUBLETIME ? 2 : 1) - 1;
+				sBoxShiftsLeft <= SBOX_SHIFTS_PER_ROUND[$clog2(SBOX_SHIFTS_PER_ROUND)-1:0] - 1;
 			end
 
 			MODE_SUBSTITUTE: begin
