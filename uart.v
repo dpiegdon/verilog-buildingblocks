@@ -60,6 +60,13 @@ module uart(
 	parameter CLOCKFRQ = 48_000_000;
 	// Baudrate to use
 	parameter BAUDRATE = 12_000_000;
+
+	generate
+		if (CLOCKFRQ % (BAUDRATE*2) != 0) begin : bad_params
+			INVALID_OR_UNINITIALIZED_PARAMETERS not_a_real_instance();
+		end
+	endgenerate
+
 	// Internal clock divider must evaluate to an integer:
 	localparam CLOCK_DIVIDE = (CLOCKFRQ/(BAUDRATE*2));
 
@@ -79,18 +86,18 @@ module uart(
 	localparam TX_SENDING = 1;
 	localparam TX_DELAY_RESTART = 2;
 
-	reg [10:0] rx_clk_divider = CLOCK_DIVIDE;
-	reg [10:0] tx_clk_divider = CLOCK_DIVIDE;
+	reg [$clog2(CLOCK_DIVIDE+1)-1:0] rx_clk_divider = CLOCK_DIVIDE;
+	reg [$clog2(CLOCK_DIVIDE+1)-1:0] tx_clk_divider = CLOCK_DIVIDE;
 
-	reg [2:0] recv_state = RX_IDLE;
-	reg [5:0] rx_countdown;
-	reg [3:0] rx_bits_remaining;
+	reg [$clog2(RX_RECEIVED+1)-1:0] recv_state = RX_IDLE;
+	reg [$clog2(4+1)-1:0] rx_countdown;
+	reg [$clog2(8+1)-1:0] rx_bits_remaining;
 	reg [7:0] rx_data;
 
 	reg tx_out = 1'b1;
-	reg [1:0] tx_state = TX_IDLE;
-	reg [5:0] tx_countdown;
-	reg [3:0] tx_bits_remaining;
+	reg [$clog2(TX_DELAY_RESTART+1)-1:0] tx_state = TX_IDLE;
+	reg [$clog2(4+1)-1:0] tx_countdown;
+	reg [$clog2(8+1)-1:0] tx_bits_remaining;
 	reg [7:0] tx_data;
 
 	assign received = (recv_state == RX_RECEIVED);
@@ -115,12 +122,12 @@ module uart(
 		// Countdown timers for the receiving and transmitting
 		// state machines are decremented.
 		rx_clk_divider = rx_clk_divider - 1;
-		if (!rx_clk_divider) begin
+		if (rx_clk_divider == 0) begin
 			rx_clk_divider = CLOCK_DIVIDE;
 			rx_countdown = rx_countdown - 1;
 		end
 		tx_clk_divider = tx_clk_divider - 1;
-		if (!tx_clk_divider) begin
+		if (tx_clk_divider == 0) begin
 			tx_clk_divider = CLOCK_DIVIDE;
 			tx_countdown = tx_countdown - 1;
 		end
@@ -139,7 +146,7 @@ module uart(
 				end
 			end
 			RX_CHECK_START: begin
-				if (!rx_countdown) begin
+				if (rx_countdown == 0) begin
 					// Check the pulse is still there
 					if (!rx) begin
 						// Pulse still there - good
@@ -156,7 +163,7 @@ module uart(
 				end
 			end
 			RX_READ_BITS: begin
-				if (!rx_countdown) begin
+				if (rx_countdown == 0) begin
 					// Should be half-way through a bit pulse here.
 					// Read this bit in, wait for the next if we
 					// have more to get.
@@ -167,7 +174,7 @@ module uart(
 				end
 			end
 			RX_CHECK_STOP: begin
-				if (!rx_countdown) begin
+				if (rx_countdown == 0) begin
 					// Should resume half-way through the stop bit
 					// This should be high - if not, reject the
 					// transmission and signal an error.
@@ -214,7 +221,7 @@ module uart(
 				end
 			end
 			TX_SENDING: begin
-				if (!tx_countdown) begin
+				if (tx_countdown == 0) begin
 					if (tx_bits_remaining) begin
 						tx_bits_remaining = tx_bits_remaining - 1;
 						tx_out = tx_data[0];
