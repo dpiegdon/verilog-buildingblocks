@@ -3,24 +3,24 @@ This file is part of verilog-buildingblocks,
 by David R. Piegdon <dgit@piegdon.de>
 
 verilog-buildingblocks is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
+it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
 verilog-buildingblocks is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Lesser General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 `default_nettype none
 
-/* Nibble-serial Spongent hash implementation.
+/* Nibble-serial implementation of the Spongent hash algorithm.
  * (Trading speed for smaller size. Can optionally enable byte-serial to
- * improve speed by factor of ~1.8)
+ * improve speed by factor of ~1.8, see SBOX_DOUBLETIME)
  *
  * Spongent is a family of lightweight cryptographic hash functions designed for
  * constrained hardware.

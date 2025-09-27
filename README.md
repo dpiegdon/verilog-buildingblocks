@@ -24,6 +24,9 @@ Contains
 * `lfsr.v`
   Generic linear feedback shift register (LFSR).
 
+* `randomized_spongent.v`
+  High quality entropy source using metastability fed into the spongent hash algorithm to whiten it.
+
 * `random.v`
   Modules to generate metastable output and random numbers.
 
@@ -35,6 +38,9 @@ Contains
 
 * `simple_spi_slave.v`
   Simple SPI slave implementation.
+
+* `spongent_hash.v`
+  Nibble-serial implementation of the Spongent hash algorithm.
 
 * `synchronizer.v`
   Cross-clockdomain signal synchronizer.
@@ -74,7 +80,7 @@ Contains
     Ring oscillator implementation.
 
 
-Contains also testbenches (`*_tb.v`) for some of the modules, see below.
+Contains also testbenches (`*_tb.v`) for many of the modules, see below.
 
 Note: most of the implementation-specific modules should be easily adaptable to other platforms.
 
@@ -82,24 +88,22 @@ Note: most of the implementation-specific modules should be easily adaptable to 
 Testbenches
 -----------
 
-Some of the modules have a testbench (`*_tb.v`). Testbenches are
+Many of the modules have a testbench (`*_tb.v`). Testbenches are
 optimizes for use with the Icarus Verilog compiler. To run all tests,
 just run `make`. The build is successfull if and only if all testbenches
 were able to build and succeeded.
 
 
-Authors
--------
+Authors/Contributors
+--------------------
 
-All files except `uart.v`:
+* David R. Piegdon <dgit@piegdon.de> -> https://github.com/dpiegdon
 
-* David R. Piegdon <dgit@piegdon.de>
+* Timothy Goddard <tim@goddard.net.nz> (Author `uart.v`)
 
-`uart.v`:
+* Arnaud Durand <arnaud.durand@unifr.ch> (Contributor `ringoscillator.v`) -> https://github.com/DurandA
 
-* Timothy Goddard <tim@goddard.net.nz>
-
-* David R. Piegdon <dgit@piegdon.de>
+* David A. Roberts <d@vidr.cc> (Contributor `lattice_ecp5/random.v`, `lattice_ecp5/ringoscillator.v`) -> https://github.com/davidar
 
 
 Licensing
@@ -107,7 +111,7 @@ Licensing
 
 License exceptions:
 
-`uart.v` -- MIT license, see header of file.
+* `uart.v` -- MIT license, see header of file.
 
 All OTHER contained files are licensed under the LGPL v3.0, see LICENSE.txt .
 That means that you may use the provided verilog modules in a proprietary
