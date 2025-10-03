@@ -31,6 +31,7 @@ module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0
 	parameter LCOUNTER_FEEDBACK = 'b110000;		// Feedback definition of the lCounter LFSR.
 	parameter LCOUNTER_INIT = 'h5;			// Initial value of the lCounter LFSR.
 	parameter SBOX_DOUBLETIME = 0;			// use two sbox (8-bit serial) instead of one (4-bit serial)?
+	parameter NOISE_DOUBLETIME = 0;			// use two noise-sources and XOR them together?
 
 	localparam SQUEEZE_AFTER = CAPACITY + RATE + 2;	// we can safely squeeze after inputting a single full state,
 							// since our input already has plenty of entropy merged into each bit.
@@ -43,9 +44,19 @@ module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0
 	always @(posedge clk) begin
 		fake_entropy <= !fake_entropy;
 	end
-	assign metastable = fake_entropy;
+	assign metastable = fake_entropy ^ NOISE_DOUBLETIME;  // only using NOISE_DOUBLETIME here so compiler doesn't complain about unused param.
 `else
-	metastable_oscillator_depth2 osci(metastable);
+	generate
+		if (NOISE_DOUBLETIME) begin : double_noise
+			wire metastable1;
+			wire metastable2;
+			metastable_oscillator_depth2 osci1(metastable1);
+			metastable_oscillator_depth2 osci2(metastable2);
+			assign metastable = metastable1 ^ metastable2;
+		end else begin : single_noise
+			metastable_oscillator_depth2 osci(metastable);
+		end
+	endgenerate
 `endif
 
 	reg [RATE-1:0] in = 0;		// input for the hash and scratchpad for entropy
