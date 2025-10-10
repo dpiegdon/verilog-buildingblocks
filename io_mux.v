@@ -26,7 +26,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
  * to be wrapped around this with the signals pin_*.
  *
  * A configurable number of inputs and outputs (RXCOUNT, TXCOUNT -- at least
- * two of each) is selectable via @func.
+ * one of each) is selectable via @func.
  * Lower numbers [0..RXCOUNT-1] select receive (input) functions,
  * while higher numbers [RXCOUNT..RXCOUNT+TXCOUNT-1] select transmit (output) functions.
  */
@@ -34,13 +34,13 @@ module io_mux(	output wire pin_enable,				// IO-pin connection: enable output se
 		output wire pin_output,				// IO-pin connection: output value to send
 		input  wire pin_input,				// IO-pin connection: input value received
 		input  wire [MUXWIDTH-1:0] func_select,		// function selection
-		output wire [RXCOUNT-1:0]  func_receive,	// func'wise demuxed value received
-		input  wire [TXCOUNT-1:0]  func_transmit);	// func'wise demuxed value to transmit
+		input  wire [TXCOUNT-1:0]  func_transmit,	// func'wise demuxed value to transmit
+		output wire [RXCOUNT-1:0]  func_receive);	// func'wise demuxed value received
 
-	parameter RXCOUNT = 2;					// number of receive functions to implement (lower bits)
 	parameter TXCOUNT = 2;					// number of transmit functions to implement (higher bits)
+	parameter RXCOUNT = 2;					// number of receive functions to implement (lower bits)
 
-	localparam FUNCCOUNT = RXCOUNT + TXCOUNT;
+	localparam FUNCCOUNT = TXCOUNT + RXCOUNT;
 	localparam MUXWIDTH = $clog2(FUNCCOUNT + 1);
 
 	wire [RXCOUNT-1:0] select_rx;

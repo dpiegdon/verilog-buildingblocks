@@ -91,6 +91,9 @@ module spongent_hash_specific_tb(output reg finished,
 	endtask
 
 	initial begin
+		errors = 0;
+		finished = 0;
+
 		if (HASHSIZE==88) begin
 			// test that reset also works (just for a smaller hash,
 			// so that the test doesn't take forever)
