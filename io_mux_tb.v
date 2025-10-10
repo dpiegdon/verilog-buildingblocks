@@ -24,7 +24,7 @@ module io_mux_specific_tb(output reg finished, output reg [15:0] errors);
 	parameter RXCOUNT = 1;
 
 	localparam FCOUNT = RXCOUNT+TXCOUNT;
-	localparam FWIDTH = $clog2(FCOUNT+1);
+	localparam FWIDTH = $clog2(FCOUNT);
 
 	reg [FWIDTH-1+1:0] func_select;
 	reg [TXCOUNT-1+1:0] func_transmit;

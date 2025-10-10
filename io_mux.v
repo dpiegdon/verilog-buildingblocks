@@ -40,8 +40,7 @@ module io_mux(	output wire pin_enable,				// IO-pin connection: enable output se
 	parameter TXCOUNT = 2;					// number of transmit functions to implement (higher bits)
 	parameter RXCOUNT = 2;					// number of receive functions to implement (lower bits)
 
-	localparam FUNCCOUNT = TXCOUNT + RXCOUNT;
-	localparam MUXWIDTH = $clog2(FUNCCOUNT + 1);
+	localparam MUXWIDTH = $clog2(TXCOUNT + RXCOUNT);
 
 	wire [RXCOUNT-1:0] select_rx;
 	wire [TXCOUNT-1:0] select_tx;
