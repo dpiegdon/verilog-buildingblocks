@@ -38,8 +38,15 @@ module io_mux(	output wire pin_enable,				// IO-pin connection: enable output se
 		input  wire [TXCOUNT-1:0]  func_transmit,	// func'wise demuxed value to transmit
 		output wire [RXCOUNT-1:0]  func_receive);	// func'wise demuxed value received
 
-	parameter TXCOUNT = 2;					// number of transmit functions to implement (higher bits)
-	parameter RXCOUNT = 2;					// number of receive functions to implement (lower bits)
+	parameter TXCOUNT = 2;					// number of transmit functions to implement (higher bits); must be > 0
+	parameter RXCOUNT = 2;					// number of receive  functions to implement (lower  bits); must be > 0
+
+	generate
+		if ((TXCOUNT <= 0) || (RXCOUNT <= 0)) begin : invalid_parameters
+			/* raise an error for invalid/uninitialized parameters */
+			INVALID_OR_UNINITIALIZED_PARAMETERS not_a_real_instance();
+		end
+	endgenerate
 
 	localparam MUXWIDTH = $clog2(TXCOUNT + RXCOUNT);
 
