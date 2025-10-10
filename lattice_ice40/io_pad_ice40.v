@@ -47,5 +47,5 @@ module io_pad_ice40(	output wire pin,				// actual IO-pin
 	);
 
 	io_mux	#(.RXCOUNT(RXCOUNT), .TXCOUNT(TXCOUNT))
-		mux(pin_enable, pin_output, pin_input, func_select, func_receive, func_transmit);
+		mux(pin_enable, pin_output, pin_input, func_select, func_transmit, func_receive);
 endmodule
