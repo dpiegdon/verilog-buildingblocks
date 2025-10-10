@@ -20,15 +20,16 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 
 /* Generic IO function multiplexer.
  *
- * This implements an IO mux for multiple different inputs and outputs.
- * Thus, this is the muxing implementation for an IO pad that can mux between
- * different functions. Actual I/O is hardware dependent and needs
- * to be wrapped around this with the signals pin_*.
+ * Implementation of an IO mux for multiple different inputs and outputs.
+ * This the mux for an IO pad that can be used for different functions.
+ * Actual I/O is hardware dependent and needs to be wrapped around this
+ * with the signals pin_*. See lattice_ice40/io_pad_ice40.v for an example.
  *
- * A configurable number of inputs and outputs (RXCOUNT, TXCOUNT -- at least
- * one of each) is selectable via @func.
- * Lower numbers [0..RXCOUNT-1] select receive (input) functions,
- * while higher numbers [RXCOUNT..RXCOUNT+TXCOUNT-1] select transmit (output) functions.
+ * - A configurable number of outputs and inputs (TXCOUNT, RXCOUNT -- at least one of each) is selectable.
+ * - Functions are counted from the right.
+ * - Receive-functions are right-most, output functions are left-most.
+ * - To select a function, write its index (from the right) into func_select.
+ * - Writing an invalid index (i.e. too large) into the func_select register results in undefined behaviour.
  */
 module io_mux(	output wire pin_enable,				// IO-pin connection: enable output setting
 		output wire pin_output,				// IO-pin connection: output value to send

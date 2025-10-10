@@ -21,7 +21,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 /* Lattice iCE40 specific IO PAD implemenation.
  *
  * Full implementation of iCE40 specific muxable IO pad.
- * See ../io_pad.v for details. */
+ * See ../io_pad.v for details on muxing and function selection. */
 module io_pad_ice40(	output wire pin,				// actual IO-pin
 			input  wire [MUXWIDTH-1:0] func_select,		// function selection
 			input  wire [TXCOUNT-1:0]  func_transmit,	// func'wise demuxed value to transmit
