@@ -143,28 +143,28 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			// check buffer values
 			@(posedge xfer_word_completed);
 			#1;
-			if (slave_buf_rx != test_mosi_value) begin
+			if (slave_buf_rx !== test_mosi_value) begin
 				$error("MOSI sent %d but received %d", test_mosi_value, slave_buf_rx);
 				errors = errors + 1;
 			end
-			if (data_rx != slave_buf_tx) begin
+			if (data_rx !== slave_buf_tx) begin
 				$error("MISO sent %d but received %d", slave_buf_tx, data_rx);
 				errors = errors + 1;
 			end
-			if (!xfer_idle) begin
+			if (xfer_idle !== 1) begin
 				$error("xfer_idle not set after xfer");
 				errors = errors + 1;
 			end
 
 			#2;
-			if (xfer_word_completed) begin
+			if (xfer_word_completed === 1) begin
 				$error("xfer_word_completed held for longer than one clock!");
 				errors = errors + 1;
 			end
 
 			// regression:
 			// should still show the same output after xfer_word_completed was released
-			if (data_rx != slave_buf_tx) begin
+			if (data_rx !== slave_buf_tx) begin
 				$error("received data latched in data_rx invalid after xfer_word_completed was released! MISO sent %d but received %d", slave_buf_tx, data_rx);
 				errors = errors + 1;
 			end
@@ -185,7 +185,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			system_clk = 0;
 			#1;
 
-			if (spi_cs) begin
+			if (spi_cs !== 0) begin
 				$error("CS set but no xfer");
 				errors = errors + 1;
 			end
@@ -198,7 +198,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			xfer_enable = 1;
 			#2;
 
-			if (!spi_cs) begin
+			if (spi_cs !== 1) begin
 				$error("CS not set during xfer");
 				errors = errors + 1;
 			end
@@ -207,7 +207,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 
 			xfer_enable = 0;
 			#2;
-			if (spi_cs) begin
+			if (spi_cs !== 0) begin
 				$error("CS set after xfer completed");
 				errors = errors + 1;
 			end
@@ -232,7 +232,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			system_clk = 0;
 			#1;
 
-			if (spi_cs) begin
+			if (spi_cs !== 0) begin
 				$error("CS set but no xfer");
 				errors = errors + 1;
 			end
@@ -245,7 +245,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 			xfer_enable = 1;
 			#2;
 
-			if (!spi_cs) begin
+			if (spi_cs !== 1) begin
 				$error("CS not set during xfer");
 				errors = errors + 1;
 			end
@@ -256,7 +256,7 @@ module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0]
 
 			xfer_enable = 0;
 			#2;
-			if (spi_cs) begin
+			if (spi_cs !== 0) begin
 				$error("CS set after xfer completed");
 				errors = errors + 1;
 			end

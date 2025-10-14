@@ -65,7 +65,7 @@ module simple_spi_master(
 	input  wire [WORDWIDTH-1:0] data_tx,		// data to transmit in next xfer word (only change this before first trigger or when xfer_ready)
 	output reg  [WORDWIDTH-1:0] data_rx,		// data received in last xfer word
 
-	output reg  spi_cs,				// SPI chipselect
+	output reg  spi_cs = 0,				// SPI chipselect
 	output reg  spi_clk,				// SPI clock
 	input  wire spi_miso,				// SPI MISO signal
 	output reg  spi_mosi);				// SPI MOSI signal
