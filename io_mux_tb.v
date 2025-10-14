@@ -112,37 +112,25 @@ module io_mux_specific_tb(output reg finished, output reg [15:0] errors);
 endmodule
 
 module io_mux_tb();
+	// maximum number of muxable signals per TX and RX.
+	// all combinations TX:1..MAXCOUNT_EACH are tested with all combinations RX:1..MAXCOUNT_EACH.
+	parameter MAXCOUNT_EACH = 8;
+
 	integer errors = 0;
 
-	localparam SUBTESTS = 25;
+	localparam SUBTESTS = MAXCOUNT_EACH*MAXCOUNT_EACH;
 	wire [SUBTESTS-1:0] subtest_finished;
 	wire [15:0] subtest_errors[SUBTESTS-1:0];
 
-	io_mux_specific_tb #(.TXCOUNT(1), .RXCOUNT(1)) subtest11(subtest_finished[ 0], subtest_errors[ 0]);
-	io_mux_specific_tb #(.TXCOUNT(1), .RXCOUNT(2)) subtest12(subtest_finished[ 1], subtest_errors[ 1]);
-	io_mux_specific_tb #(.TXCOUNT(1), .RXCOUNT(3)) subtest13(subtest_finished[ 2], subtest_errors[ 2]);
-	io_mux_specific_tb #(.TXCOUNT(1), .RXCOUNT(4)) subtest14(subtest_finished[ 3], subtest_errors[ 3]);
-	io_mux_specific_tb #(.TXCOUNT(1), .RXCOUNT(5)) subtest15(subtest_finished[ 4], subtest_errors[ 4]);
-	io_mux_specific_tb #(.TXCOUNT(2), .RXCOUNT(1)) subtest21(subtest_finished[ 5], subtest_errors[ 5]);
-	io_mux_specific_tb #(.TXCOUNT(2), .RXCOUNT(2)) subtest22(subtest_finished[ 6], subtest_errors[ 6]);
-	io_mux_specific_tb #(.TXCOUNT(2), .RXCOUNT(3)) subtest23(subtest_finished[ 7], subtest_errors[ 7]);
-	io_mux_specific_tb #(.TXCOUNT(2), .RXCOUNT(4)) subtest24(subtest_finished[ 8], subtest_errors[ 8]);
-	io_mux_specific_tb #(.TXCOUNT(2), .RXCOUNT(5)) subtest25(subtest_finished[ 9], subtest_errors[ 9]);
-	io_mux_specific_tb #(.TXCOUNT(3), .RXCOUNT(1)) subtest31(subtest_finished[10], subtest_errors[10]);
-	io_mux_specific_tb #(.TXCOUNT(3), .RXCOUNT(2)) subtest32(subtest_finished[11], subtest_errors[11]);
-	io_mux_specific_tb #(.TXCOUNT(3), .RXCOUNT(3)) subtest33(subtest_finished[12], subtest_errors[12]);
-	io_mux_specific_tb #(.TXCOUNT(3), .RXCOUNT(4)) subtest34(subtest_finished[13], subtest_errors[13]);
-	io_mux_specific_tb #(.TXCOUNT(3), .RXCOUNT(5)) subtest35(subtest_finished[14], subtest_errors[14]);
-	io_mux_specific_tb #(.TXCOUNT(4), .RXCOUNT(1)) subtest41(subtest_finished[15], subtest_errors[15]);
-	io_mux_specific_tb #(.TXCOUNT(4), .RXCOUNT(2)) subtest42(subtest_finished[16], subtest_errors[16]);
-	io_mux_specific_tb #(.TXCOUNT(4), .RXCOUNT(3)) subtest43(subtest_finished[17], subtest_errors[17]);
-	io_mux_specific_tb #(.TXCOUNT(4), .RXCOUNT(4)) subtest44(subtest_finished[18], subtest_errors[18]);
-	io_mux_specific_tb #(.TXCOUNT(4), .RXCOUNT(5)) subtest45(subtest_finished[19], subtest_errors[19]);
-	io_mux_specific_tb #(.TXCOUNT(5), .RXCOUNT(1)) subtest51(subtest_finished[20], subtest_errors[20]);
-	io_mux_specific_tb #(.TXCOUNT(5), .RXCOUNT(2)) subtest52(subtest_finished[21], subtest_errors[21]);
-	io_mux_specific_tb #(.TXCOUNT(5), .RXCOUNT(3)) subtest53(subtest_finished[22], subtest_errors[22]);
-	io_mux_specific_tb #(.TXCOUNT(5), .RXCOUNT(4)) subtest54(subtest_finished[23], subtest_errors[23]);
-	io_mux_specific_tb #(.TXCOUNT(5), .RXCOUNT(5)) subtest55(subtest_finished[24], subtest_errors[24]);
+	generate
+		// test for all kind of TXCOUNT and RXCOUNT combinations
+		genvar tx, rx;
+		for(tx = 0; tx < MAXCOUNT_EACH; tx=tx+1) begin
+			for(rx = 0; rx < MAXCOUNT_EACH; rx=rx+1) begin
+				io_mux_specific_tb #(.TXCOUNT(tx+1), .RXCOUNT(rx+1)) subtest(subtest_finished[tx*MAXCOUNT_EACH+rx], subtest_errors[tx*MAXCOUNT_EACH+rx]);
+			end
+		end
+	endgenerate
 
 	wire finished = &(subtest_finished);
 	integer i;
