@@ -102,10 +102,9 @@ module simple_spi_master(
 	endgenerate
 
 	reg [1:0] state = STATE_XFER_AWAIT;
-	reg [WORDWIDTH-1:0] current_mask = 0;							// mask with only current bit set
+	reg [$clog2(WORDWIDTH+1)-1:0] bit_counter;
 	reg [PRESCALER_WIDTH-1+1:0] clk_prescaler = 0;						// prescaler counter
 	wire [PRESCALER_WIDTH-1+1:0] clk_last = {1'b0, clk_div} + 1;				// stop-condition for prescaler counter
-	wire [WORDWIDTH-1:0] next_mask = msb_first ? (current_mask >> 1) : (current_mask << 1);	// mask for the next bit to be xfer'ed, or 0 when finished
 	assign xfer_idle = xfer_enable && (state == STATE_XFER_AWAIT);
 
 	always @(posedge system_clk) begin
@@ -114,12 +113,12 @@ module simple_spi_master(
 				STATE_XFER_AWAIT: begin
 					spi_cs <= 1;
 					spi_clk <= cpol;
+					bit_counter <= WORDWIDTH;
 					xfer_word_completed <= 0;
 					spi_mosi <= 0;
 					clk_prescaler <= 0;
-					current_mask <= (msb_first) ? (1 << (WORDWIDTH-1)) : 1;
 					if (xfer_word_trigger) begin
-						data_rx <= 0;
+						data_rx <= data_tx;
 						state <= STATE_XFER_LATCH;
 					end
 				end
@@ -128,12 +127,18 @@ module simple_spi_master(
 						if (clk_prescaler == 0) begin
 							if (state == STATE_XFER_LATCH) begin
 								// latch output data
-								spi_mosi <= |(data_tx & current_mask);
+								if (msb_first) begin
+									{spi_mosi, data_rx} <= {data_rx, 1'b0};
+								end else begin
+									{data_rx, spi_mosi} <= {1'b0, data_rx};
+								end
 								spi_clk <= cpol ^ cpha;
 							end else begin
 								// sample input data
-								if (spi_miso_synced) begin
-									data_rx <= data_rx | current_mask;
+								if (msb_first) begin
+									data_rx[0] <= spi_miso_synced;
+								end else begin
+									data_rx[WORDWIDTH-1] <= spi_miso_synced;
 								end
 								spi_clk <= !(cpol ^ cpha);
 							end
@@ -142,8 +147,8 @@ module simple_spi_master(
 					end else begin
 						clk_prescaler <= 0;
 						if (state == STATE_XFER_SAMPLE) begin
-							current_mask <= next_mask;
-							state <= (|next_mask) ? STATE_XFER_LATCH : STATE_XFER_READY;
+							state <= (bit_counter == 1) ? STATE_XFER_READY : STATE_XFER_LATCH;
+							bit_counter <= bit_counter-1;
 						end else begin
 							state <= STATE_XFER_SAMPLE;
 						end
