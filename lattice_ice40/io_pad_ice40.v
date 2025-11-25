@@ -17,7 +17,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 `default_nettype none
-`include "console.inc"
+`include "../console.inc"
 
 /* Lattice iCE40 specific IO PAD implemenation.
  *
