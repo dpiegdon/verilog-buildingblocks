@@ -17,6 +17,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 `default_nettype none
+`include "console.inc"
 
 /* Lattice iCE40 specific IO PAD implemenation.
  *
@@ -31,9 +32,11 @@ module io_pad_ice40(	output wire pin,				// actual IO-pin
 	parameter RXCOUNT = 2;						// number of receive  functions to implement (lower  bits); must be > 0
 
 	generate
-		if ((TXCOUNT <= 0) || (RXCOUNT <= 0)) begin : invalid_parameters
-			/* raise an error for invalid/uninitialized parameters */
-			INVALID_OR_UNINITIALIZED_PARAMETERS not_a_real_instance();
+		if (TXCOUNT <= 0) begin : bad_tx_count
+			`ERROR("Bad TXCOUNT");
+		end
+		if (RXCOUNT <= 0) begin : bad_rx_count
+			`ERROR("Bad RXCOUNT");
 		end
 	endgenerate
 

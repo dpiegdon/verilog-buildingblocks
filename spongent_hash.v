@@ -17,6 +17,7 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 `default_nettype none
+`include "console.inc"
 
 /* Nibble-serial implementation of the Spongent hash algorithm.
  * (Trading speed for smaller size. Can optionally enable byte-serial to
@@ -97,18 +98,35 @@ module spongent_hash(
 
 	generate
 		// weed out obviously bad parameters
-		if (       (HASHSIZE < 88)
-			|| (HASHSIZE % 8 != 0)
-			|| (CAPACITY < 80)
-			|| (CAPACITY % 8 != 0)
-			|| (RATE < 8)
-			|| (RATE % 8 != 0)
-			|| (ROUNDS < 45)
-			|| (LCOUNTER_FEEDBACK <= 0)
-			|| (LCOUNTER_INIT <= 0)
-			|| (HASHSIZE % RATE != 0)) begin : invalid_parameters
-			/* raise an error for invalid/uninitialized parameters */
-			INVALID_OR_UNINITIALIZED_PARAMETERS not_a_real_instance();
+		if (HASHSIZE < 88) begin : hashsize_too_small
+			`ERROR("HASHSIZE too small");
+		end
+		if (HASHSIZE % 8 != 0) begin : hashsize_not_bytes
+			`ERROR("HASHSIZE not multiple of 8");
+		end
+		if (CAPACITY < 80) begin : capacity_too_small
+			`ERROR("CAPACITY too small");
+		end
+		if (CAPACITY % 8 != 0) begin : capacity_not_bytes
+			`ERROR("CAPACITY not multiple of 8");
+		end
+		if (RATE < 8) begin : rate_too_small
+			`ERROR("RATE too small");
+		end
+		if (RATE % 8 != 0) begin : rate_not_bytes
+			`ERROR("RATE not multiple of 8");
+		end
+		if (ROUNDS < 45) begin : rounds_too_small
+			`ERROR("ROUNDS too small");
+		end
+		if (LCOUNTER_FEEDBACK <= 0) begin : bad_lcounter_feedback
+			`ERROR("Bad LCOUNTER_FEEDBACK");
+		end
+		if (LCOUNTER_INIT <= 0) begin : bad_lcounter_init
+			`ERROR("Bad LCOUNTER_INIT");
+		end
+		if (HASHSIZE % RATE != 0) begin : hashsize_not_multiple_of_rate
+			`ERROR("HASHSIZE not multiple of RATE");
 		end
 	endgenerate
 

@@ -40,6 +40,7 @@
  */
 
 `default_nettype none
+`include "console.inc"
 
 module uart(
 	input  wire clk,		// The master clock for this module
@@ -63,7 +64,7 @@ module uart(
 
 	generate
 		if (CLOCKFRQ % (BAUDRATE*2) != 0) begin : bad_params
-			INVALID_OR_UNINITIALIZED_PARAMETERS not_a_real_instance();
+			`ERROR("CLOCKFRQ not divisible by BAUDRATE*2");
 		end
 	endgenerate
 
