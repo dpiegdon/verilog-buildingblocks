@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__binary_debias_v__
+`define __vbb__binary_debias_v__
+
 `default_nettype none
 
 // Reduce a simple statistical bias in a random stream,
@@ -44,3 +47,4 @@ module binary_debias(input wire clk, input wire metastable, output reg bit_ready
 
 endmodule
 
+`endif // __vbb__binary_debias_v__

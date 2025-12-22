@@ -16,7 +16,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__rotary_encoder_v__
+`define __vbb__rotary_encoder_v__
+
 `default_nettype none
+
+`include "debouncer.v"
 
 /* Debounced digital rotary encoder. (e.g. EC11)
  *
@@ -53,3 +58,4 @@ module rotary_encoder(input wire clk, input wire in_a, input wire in_b, output w
 	assign out_cw = previous_marker && debounced_a;
 endmodule
 
+`endif // __vbb__rotary_encoder_v__

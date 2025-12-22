@@ -16,7 +16,13 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__lattice_ice40__bounced_button_v__
+`define __vbb__lattice_ice40__bounced_button_v__
+
 `default_nettype none
+
+`include "../debouncer.v"
+`include "pullup_input.v"
 
 // Fully debounced button with an internal pull-up.
 // Connect a switch to the pin that pulls it to GND when pressed.
@@ -34,3 +40,4 @@ module debounced_button(input wire clk, input wire in, output wire out_state, ou
 				.out_edge(out_edge));
 endmodule
 
+`endif // __vbb__lattice_ice40__bounced_button_v__

@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__lfsr_v__
+`define __vbb__lfsr_v__
+
 `default_nettype none
 
 // Implements a generic linear feedback shift register that allows to shift
@@ -49,3 +52,4 @@ module lfsr(input wire clk, input wire random, output reg [WIDTH-1:0] shiftreg, 
 
 endmodule
 
+`endif // __vbb__lfsr_v__

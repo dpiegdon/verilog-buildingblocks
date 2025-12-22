@@ -16,7 +16,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__random_v__
+`define __vbb__random_v__
+
 `default_nettype none
+
+`include "binary_debias.v"
+`include "lfsr.v"
+// NOTE: you need to pick/provide metastable_oscillator and
+// metastable_oscillator_depth2 matching your FPGA architecture.
 
 // LFSR for random number generation that is seeded from a metastable
 // source. Yields bits at bit_ready, or fully independent words at
@@ -90,3 +98,5 @@ module randomized_lfsr_weak(input wire clk, input wire rst, output wire [WIDTH-1
 	metastable_oscillator osci(metastable);
 	lfsr #(.WIDTH(WIDTH), .INIT_VALUE(INIT_VALUE), .FEEDBACK(FEEDBACK)) shiftreg(clk, metastable, out, rst);
 endmodule
+
+`endif // __vbb__random_v__

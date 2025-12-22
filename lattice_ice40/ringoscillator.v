@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__lattice_ice40__ringoscillator_v__
+`define __vbb__lattice_ice40__ringoscillator_v__
+
 `default_nettype none
 
 /* Ring oscillator.
@@ -132,3 +135,5 @@ module ringoscillator_adjustable(output wire chain_out, input [TAPWIDTH-1:0] tap
 		end
 	endgenerate
 endmodule
+
+`endif // __vbb__lattice_ice40__ringoscillator_v__

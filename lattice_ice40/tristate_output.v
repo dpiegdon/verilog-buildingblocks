@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__lattice_ice40__tristate_output_v__
+`define __vbb__lattice_ice40__tristate_output_v__
+
 `default_nettype none
 
 // Implementation of tristateable output.
@@ -30,3 +33,4 @@ module tristate_output(output pin, input wire enable, input wire value);
 	);
 endmodule
 
+`endif // __vbb__lattice_ice40__tristate_output_v__

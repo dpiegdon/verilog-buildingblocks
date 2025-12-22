@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__prescaler_v__
+`define __vbb__prescaler_v__
+
 `default_nettype none
 
 /* Clock Prescaler.
@@ -40,3 +43,4 @@ module clock_prescaler(input wire clkin, output wire [WIDTH-1:0] clkout, input w
 	assign clkout = { prescaler, clkin };
 endmodule
 
+`endif // __vbb__prescaler_v__

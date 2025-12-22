@@ -39,8 +39,12 @@
  *	(dpiegdon)
  */
 
+`ifndef __vbb__uart_v__
+`define __vbb__uart_v__
+
 `default_nettype none
-`include "console.inc"
+
+`include "console.v"
 
 module uart(
 	input  wire clk,		// The master clock for this module
@@ -248,3 +252,4 @@ module uart(
 
 endmodule
 
+`endif // __vbb__uart_v__

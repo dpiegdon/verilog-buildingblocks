@@ -16,7 +16,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__lattice_ecp5__random_v__
+`define __vbb__lattice_ecp5__random_v__
+
 `default_nettype none
+
+`include "ringoscillator.v"
 
 // Circuit generating a metastable output.
 module metastable_oscillator(output wire metastable);
@@ -46,3 +51,4 @@ module metastable_oscillator_depth2(output wire metastable);
 		destabilizer (.Z(metastable), .A(s0), .B(s1), .C(s2), .D(s3));
 endmodule
 
+`endif // __vbb__lattice_ecp5__random_v__

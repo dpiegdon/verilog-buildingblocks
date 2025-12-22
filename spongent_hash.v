@@ -16,8 +16,13 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__spongent_hash_v__
+`define __vbb__spongent_hash_v__
+
 `default_nettype none
-`include "console.inc"
+
+`include "console.v"
+`include "lfsr.v"
 
 /* Nibble-serial implementation of the Spongent hash algorithm.
  * (Trading speed for smaller size. Can optionally enable byte-serial to
@@ -335,3 +340,5 @@ module spongent_hash(
 		endcase
 	end
 endmodule
+
+`endif // __vbb__spongent_hash_v__

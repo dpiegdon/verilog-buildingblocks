@@ -19,6 +19,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
+`include "spongent_hash.v"
+
 module spongent_hash_specific_tb(output reg finished,
 				 output reg [15:0] errors,
 				 input wire [HASHSIZE-1:0] expected_result);

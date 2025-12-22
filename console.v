@@ -1,4 +1,4 @@
-/* vim: syntax=verilog
+/* vim: filetype=verilog
 This file is part of verilog-buildingblocks,
 by David R. Piegdon <dgit@piegdon.de>
 
@@ -44,9 +44,16 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
  * 8: invisible
  */
 
+`ifndef __vbb__console_v__
+`define __vbb__console_v__
+
+`default_nettype none
+
 `define CON_BOLD_RED     	"\033[1;31m"
 `define CON_BOLD_YELLOW  	"\033[1;33m"
 `define CON_RST          	"\033[0m"
 
 `define WARNING(msg)		$warning({`CON_BOLD_YELLOW, msg, `CON_RST})
 `define ERROR(msg)		$error({`CON_BOLD_RED, msg, `CON_RST})
+
+`endif // __vbb__console_v__

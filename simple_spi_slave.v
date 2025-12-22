@@ -16,7 +16,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__simple_spi_slave_v__
+`define __vbb__simple_spi_slave_v__
+
 `default_nettype none
+
+`include "synchronizer.v"
 
 /* Simple SPI slave implementation.
  *
@@ -98,3 +103,5 @@ module simple_spi_slave(
 	end
 
 endmodule
+
+`endif // __vbb__simple_spi_slave_v__

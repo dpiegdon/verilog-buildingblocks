@@ -19,6 +19,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
+`include "simple_spi_master.v"
+
 module simple_spi_master_with_synctime_tb(output reg finished, output reg [15:0] errors);
 	parameter WORDWIDTH = 4;
 	parameter SYNCTIME = 3;

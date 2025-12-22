@@ -16,8 +16,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__io_mux_v__
+`define __vbb__io_mux_v__
+
 `default_nettype none
-`include "console.inc"
+
+`include "console.v"
 
 /* Generic IO function multiplexer.
  *
@@ -61,3 +65,5 @@ module io_mux(	output wire pin_enable,				// IO-pin connection: enable output se
 	assign pin_output = |(func_transmit & select_tx);
 	assign func_receive = pin_input ? select_rx : 0;
 endmodule
+
+`endif // __vbb__io_mux_v__

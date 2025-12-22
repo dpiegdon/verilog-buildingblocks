@@ -19,6 +19,9 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
+`define TESTBENCH
+`include "randomized_spongent.v"
+
 module randomized_spongent_tb();
 	integer errors = 0;
 

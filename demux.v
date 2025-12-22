@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__demux_v__
+`define __vbb__demux_v__
+
 `default_nettype none
 
 // Demultiplexer.
@@ -32,3 +35,4 @@ module demux(input wire enable, input wire [SELECTOR_WIDTH-1:0] selector, output
 	endgenerate
 endmodule
 
+`endif // __vbb__demux_v__

@@ -19,6 +19,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
+`include "demux.v"
+
 // testbench for demultiplexer.
 module demux_tb();
 	localparam OUTPUT_WIDTH = 2**10+1;
@@ -67,4 +69,3 @@ module demux_tb();
 			$fatal();
 	end
 endmodule
-

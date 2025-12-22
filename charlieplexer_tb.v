@@ -19,6 +19,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
+`include "charlieplexer.v"
+
 // testbench for charlieplexer.
 module charlieplexer_tb();
 	localparam PINCOUNT=33;
@@ -152,4 +154,3 @@ module charlieplexer_tb();
 			$fatal();
 	end
 endmodule
-

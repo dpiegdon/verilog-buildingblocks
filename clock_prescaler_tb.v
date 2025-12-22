@@ -19,8 +19,9 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
-// testbench for clock_prescaler
+`include "clock_prescaler.v"
 
+// testbench for clock_prescaler
 module clock_prescaler_tb();
 	parameter WIDTH=32;
 
@@ -66,4 +67,3 @@ module clock_prescaler_tb();
 	end
 
 endmodule
-

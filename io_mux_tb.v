@@ -19,6 +19,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
+`include "io_mux.v"
+
 module io_mux_specific_tb(output reg finished, output reg [15:0] errors);
 	parameter TXCOUNT = 1;
 	parameter RXCOUNT = 1;

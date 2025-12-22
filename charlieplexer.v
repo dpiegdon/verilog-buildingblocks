@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__charlieplexer_v__
+`define __vbb__charlieplexer_v__
+
 `default_nettype none
 
 /* Generic charlieplexer module to control (PINCOUNT * (PINCOUNT-1)) LEDs
@@ -148,3 +151,4 @@ module charlieplex_display(
 		.out_value(out_value));
 endmodule
 
+`endif // __vbb__charlieplexer_v__

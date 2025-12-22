@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__debouncer_v__
+`define __vbb__debouncer_v__
+
 `default_nettype none
 
 // input debouncer.
@@ -70,3 +73,4 @@ module debouncer(
 
 endmodule
 
+`endif // __vbb__debouncer_v__

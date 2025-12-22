@@ -16,7 +16,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__randomized_spongent_v__
+`define __vbb__randomized_spongent_v__
+
 `default_nettype none
+
+`include "spongent_hash.v"
 
 /* Randomness source from a metastable data stream fed through the spongent hashing algorithm to whiten the entropy.
  *
@@ -40,6 +45,7 @@ module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0
 	reg [3:0] rng_input = 0;	// shift through a few FFs to get rid of metastable state before actually using it
 
 `ifdef TESTBENCH
+	// for testbench we need to avoid using platform-specific metastable_oscillator_depth2()
 	reg fake_entropy = 0;
 	always @(posedge clk) begin
 		fake_entropy <= !fake_entropy;
@@ -118,3 +124,5 @@ module randomized_spongent(input wire clk, input wire rst, output wire [RATE-1:0
 		end
 	end
 endmodule
+
+`endif // __vbb__randomized_spongent_v__

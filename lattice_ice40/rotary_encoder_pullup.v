@@ -16,7 +16,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__lattice_ice40__encoder_pullup_v__
+`define __vbb__lattice_ice40__encoder_pullup_v__
+
 `default_nettype none
+
+`include "pullup_input.v"
 
 /* Debounced digital rotary encoder. (e.g. EC11)
  *
@@ -39,3 +44,4 @@ module rotary_encoder_pullup(input wire clk, input wire in_a, input wire in_b, o
 
 endmodule
 
+`endif // __vbb__lattice_ice40__encoder_pullup_v__

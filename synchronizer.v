@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__synchronizer_v__
+`define __vbb__synchronizer_v__
+
 `default_nettype none
 
 /* Synchronizes a signal to a clockdomain using a shift register.
@@ -39,3 +42,4 @@ module synchronizer(input wire clk, input wire in, output wire out, output wire 
 	end
 endmodule
 
+`endif // __vbb__synchronizer_v__

@@ -19,6 +19,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
+`include "lfsr.v"
+
 // testbench for lfsr.
 module lfsr_tb();
 	localparam ITERATIONS=1001;
@@ -113,4 +115,3 @@ module lfsr_tb();
 	end
 
 endmodule
-

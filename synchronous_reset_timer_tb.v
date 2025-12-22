@@ -19,8 +19,9 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
-// testbench for synchronous_reset_timer
+`include "synchronous_reset_timer.v"
 
+// testbench for synchronous_reset_timer
 module single_synchronous_reset_timer_tb();
 
 	parameter LENGTH=7;

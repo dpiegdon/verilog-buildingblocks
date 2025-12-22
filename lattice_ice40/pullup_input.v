@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__lattice_ice40__pullup_input_v__
+`define __vbb__lattice_ice40__pullup_input_v__
+
 `default_nettype none
 
 // Implementation of input with pullup.
@@ -29,3 +32,4 @@ module pullup_input(input pin, output wire value);
 	);
 endmodule
 
+`endif // __vbb__lattice_ice40__pullup_input_v__

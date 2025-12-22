@@ -16,8 +16,13 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__lattice_ice40__io_pad_ice40_v__
+`define __vbb__lattice_ice40__io_pad_ice40_v__
+
 `default_nettype none
-`include "../console.inc"
+
+`include "../console.v"
+`include "../io_mux.v"
 
 /* Lattice iCE40 specific IO PAD implemenation.
  *
@@ -59,3 +64,5 @@ module io_pad_ice40(	output wire pin,				// actual IO-pin
 	io_mux	#(.RXCOUNT(RXCOUNT), .TXCOUNT(TXCOUNT))
 		mux(pin_enable, pin_output, pin_input, func_select, func_transmit, func_receive);
 endmodule
+
+`endif // __vbb__lattice_ice40__io_pad_ice40_v__

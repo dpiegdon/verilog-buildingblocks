@@ -19,8 +19,9 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 `timescale 1ns / 1ps
 
-// testbench for simple_spi_slave
+`include "simple_spi_slave.v"
 
+// testbench for simple_spi_slave
 module simple_spi_slave_tb();
 	parameter WIDTH=4;
 

@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+`ifndef __vbb__synchronous_reset_timer_v__
+`define __vbb__synchronous_reset_timer_v__
+
 `default_nettype none
 
 // synchronize a reset signal to a clock, also stretch it to LENGTH clocks.
@@ -35,3 +38,4 @@ module synchronous_reset_timer(input wire clk, output wire reset_out, input wire
 
 endmodule
 
+`endif // __vbb__synchronous_reset_timer_v__
