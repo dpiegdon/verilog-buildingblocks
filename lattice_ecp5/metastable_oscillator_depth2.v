@@ -16,28 +16,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-`ifndef __vbb__lattice_ecp5__random_v__
-`define __vbb__lattice_ecp5__random_v__
+`ifndef __vbb__lattice_ecp5__metastable_oscillator_depth2_v__
+`define __vbb__lattice_ecp5__metastable_oscillator_depth2_v__
 
 `default_nettype none
 
-`include "ringoscillator.v"
+`include "metastable_oscillator.v"
 
-// Circuit generating a metastable output.
-module metastable_oscillator(output wire metastable);
-	wire s0, s1, s2, s3;
-
-	ringoscillator r0(s0);
-	ringoscillator r1(s1);
-	ringoscillator r2(s2);
-	ringoscillator r3(s3);
-
-	(* keep *)
-	LUT4 #(.INIT(16'b1010_1100_1110_0001))
-		destabilizer (.Z(metastable), .A(s0), .B(s1), .C(s2), .D(s3));
-endmodule
-
-// Circuit generating an even more metastable output.
+// Circuit generating an even more metastable output than
+// metastable_oscillator.
 module metastable_oscillator_depth2(output wire metastable);
 	wire s0, s1, s2, s3;
 
@@ -51,4 +38,4 @@ module metastable_oscillator_depth2(output wire metastable);
 		destabilizer (.Z(metastable), .A(s0), .B(s1), .C(s2), .D(s3));
 endmodule
 
-`endif // __vbb__lattice_ecp5__random_v__
+`endif // __vbb__lattice_ecp5__metastable_oscillator_depth2_v__

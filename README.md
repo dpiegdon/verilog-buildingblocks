@@ -10,7 +10,9 @@ Contains
 
 * `charlieplexer.v`
   Generic charlieplexing module for N pins to control `N*(N-1)` LEDs.
-  Also contains a generic addressable display that uses a charlieplexer.
+
+* `charlieplex_display.v`
+  A generic addressable display that uses a charlieplexer.
 
 * `clock_prescaler.v`
   Simple clock prescaler implementation that also exposes the full prescaler counter.
@@ -27,8 +29,11 @@ Contains
 * `randomized_spongent.v`
   High quality entropy source using metastability fed into the spongent hash algorithm to whiten it.
 
-* `random.v`
-  Modules to generate metastable output and random numbers.
+* `randomized_lfsr.v`
+  Module to generate metastable output and random numbers.
+
+* `randomized_lfsr_weak.v`
+  Module to generate weak metastable output and weak random numbers.
 
 * `rotary_encoder.v`
   Input decoder for debounced digital rotary encoders like the EC11.
@@ -59,25 +64,37 @@ Contains
   - `lattice_ice40/pullup_input.v`
     Input with pullup.
 
-  - `lattice_ice40/random.v`
-    Modules for random number generation.
-
-  - `lattice_ice40/ringoscillator.v`
-    Ring oscillator implementation.
-
   - `lattice_ice40/rotary_encoder_pullup.v`
     Pull-up implementation for rotary encoder input controller.
 
   - `lattice_ice40/tristate_output.v`
     A tristateable output.
 
-* Lattice ECP5 specific implementations (in `lattice_ecp5/`)
+  - `lattice_ice40/metastable_oscillator.v`
+    Circuit generating a metastable output.
 
-  - `lattice_ice40/random.v`
-    Modules for random number generation.
+  - `lattice_ice40/metastable_oscillator_depth2.v`
+    Circuit generating an even more metastable output than `metastable_oscillator`.
 
   - `lattice_ice40/ringoscillator.v`
     Ring oscillator implementation.
+
+  - `lattice_ice40/ringoscillator_adjustable.v`
+    Adjustable ring oscillator implementation.
+
+* Lattice ECP5 specific implementations (in `lattice_ecp5/`)
+
+  - `lattice_ecp5/metastable_oscillator.v`
+    Circuit generating a metastable output.
+
+  - `lattice_ecp5/metastable_oscillator_depth2.v`
+    Circuit generating an even more metastable output than `metastable_oscillator`.
+
+  - `lattice_ecp5/ringoscillator.v`
+    Ring oscillator implementation.
+
+  - `lattice_ecp5/ringoscillator_adjustable.v`
+    Adjustable ring oscillator implementation.
 
 
 Contains also testbenches (`*_tb.v`) for many of the modules, see below.

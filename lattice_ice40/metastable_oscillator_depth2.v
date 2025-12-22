@@ -16,20 +16,26 @@ You should have received a copy of the GNU Lesser General Public License
 along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-`ifndef __vbb__lattice_ice40__pullup_input_v__
-`define __vbb__lattice_ice40__pullup_input_v__
+`ifndef __vbb__lattice_ice40__metastable_oscillator_depth2_v__
+`define __vbb__lattice_ice40__metastable_oscillator_depth2_v__
 
 `default_nettype none
 
-// Implementation of input with pullup.
-module pullup_input(input pin, output wire value);
-	SB_IO #(
-		.PIN_TYPE(6'b0000_01),
-		.PULLUP(1'b1)
-	) sb_io (
-		.PACKAGE_PIN(pin),
-		.D_IN_0(value)
-	);
+`include "metastable_oscillator.v"
+
+// Circuit generating an even more metastable output than
+// metastable_oscillator.
+module metastable_oscillator_depth2(output wire metastable);
+	wire s0, s1, s2, s3;
+
+	metastable_oscillator r0(s0);
+	metastable_oscillator r1(s1);
+	metastable_oscillator r2(s2);
+	metastable_oscillator r3(s3);
+
+	(* keep *)
+	SB_LUT4 #(.LUT_INIT(16'b0101_0011_0001_1110))
+		destabilizer (.O(metastable), .I0(s0), .I1(s1), .I2(s2), .I3(s3));
 endmodule
 
-`endif // __vbb__lattice_ice40__pullup_input_v__
+`endif // __vbb__lattice_ice40__metastable_oscillator_depth2_v__

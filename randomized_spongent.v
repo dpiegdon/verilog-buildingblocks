@@ -22,6 +22,8 @@ along with verilog-buildingblocks.  If not, see <https://www.gnu.org/licenses/>.
 `default_nettype none
 
 `include "spongent_hash.v"
+// NOTE: you need to pick/provide metastable_oscillator and
+// metastable_oscillator_depth2 matching your FPGA architecture.
 
 /* Randomness source from a metastable data stream fed through the spongent hashing algorithm to whiten the entropy.
  *
